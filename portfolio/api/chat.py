@@ -1,9 +1,10 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import os
-import pypdf
+import urllib.request
+import urllib.error
 
-# Load dotenv if running locally
+# Load environment variables if .env exists
 try:
     import dotenv
     dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
@@ -11,80 +12,85 @@ try:
 except Exception:
     pass
 
-# Try finding the resume PDF
-RESUME_TEXT = ""
-possible_paths = [
-    os.path.join(os.path.dirname(__file__), "..", "ART_Resume-2.pdf"),
-    os.path.join(os.path.dirname(__file__), "ART_Resume-2.pdf"),
-    os.path.join(os.getcwd(), "ART_Resume-2.pdf"),
-    "ART_Resume-2.pdf"
-]
+# Hardcoded complete resume facts for instant zero-dependency serverless execution
+RESUME_FACTS = """
+ALOK RANJAN TRIPATHY
+B.Tech in Computer Science and Engineering, IIIT Bhubaneswar (Expected Graduation: 2028)
+Email: alokrtofc@gmail.com | Phone: +91 7978631653
+GitHub: github.com/ArtExists | LinkedIn: linkedin.com/in/alok-ranjan-tripathy
 
-for p in possible_paths:
-    if os.path.exists(p):
-        try:
-            reader = pypdf.PdfReader(p)
-            extracted_pages = []
-            for i, page in enumerate(reader.pages):
-                txt = page.extract_text()
-                if txt:
-                    extracted_pages.append(f"--- PAGE {i+1} ---\n{txt.strip()}")
-            RESUME_TEXT = "\n\n".join(extracted_pages)
-            break
-        except Exception:
-            pass
+TECHNICAL SKILLS:
+- Languages: Python, C, C++
+- Tools: Git, Jupyter Notebook, Streamlit, Flask
+- ML / DL Frameworks: PyTorch, TensorFlow, scikit-learn, pure NumPy
+- Computer Vision: OpenCV, MediaPipe, YOLO, Segment Anything (SAM)
+- LLMs & GenAI: LangChain, LangGraph, RAG (Retrieval-Augmented Generation), DDPM Diffusion
 
-# Initialize Mistral AI via LangChain
-mistral_chain = None
-raw_key = os.environ.get("MISTRAL_API_KEY", "")
-api_key = raw_key.strip().strip('"').strip("'") if raw_key else ""
+FEATURED PROJECTS:
+1. TryThyEye: Real-time virtual sunglasses try-on system leveraging SAM (Segment Anything Model) and YOLO for facial landmark segmentation, occlusion handling, and perspective warping.
+2. Numpy_ANN_Mnist: Built a fully connected Neural Network from scratch in pure mathematical NumPy with custom forward/backpropagation and SGD, achieving 85%+ test accuracy on MNIST without any deep learning framework.
+3. PhilGTP: RAG-based philosophical dialogue engine powered by LangChain and Mistral, grounding conversations in canonical philosopher texts to prevent hallucinations.
+4. MNIST_Diffusion: Denoising Diffusion Probabilistic Model (DDPM) built with a custom UNet to synthesize realistic handwritten digits from Gaussian noise.
+5. HGR_Temple_Run: Real-time hand gesture recognition system interfacing OpenCV and MediaPipe to control game navigation (e.g. Temple Run).
+6. Emotion_Det: Unified multimodal emotion perception pipeline combining facial landmarks, audio voice features, and NLP for holistic social cue understanding.
 
-if api_key:
+EXPERIENCE & EDUCATION:
+- IIIT Bhubaneswar: B.Tech in CSE (2024 - 2028)
+- Tata iQ (Forage): AI & Data Analytics Job Simulation (2025)
+"""
+
+def query_mistral_api(user_message: str) -> str:
+    raw_key = os.environ.get("MISTRAL_API_KEY", "")
+    api_key = raw_key.strip().strip('"').strip("'")
+    
+    if not api_key:
+        return get_fallback_answer(user_message)
+    
+    system_prompt = (
+        "You are 'Ask_ART', an intelligent, polite, and charismatic AI spirit guide and portfolio companion "
+        "for Alok Ranjan Tripathy (Computer Science undergraduate at IIIT Bhubaneswar).\n"
+        "Answer questions from visitors, recruiters, and engineers accurately based on Alok's resume below.\n\n"
+        f"{RESUME_FACTS}\n\n"
+        "GUIDELINES:\n"
+        "1. Be direct, concise, and structured (2-4 sentences or clean bullet points).\n"
+        "2. Add a tasteful subtle Japanese aesthetic spirit (e.g., 'ようこそ', 'Konnichiwa', '⛩️', '🌸', '✨').\n"
+        "3. Ground all answers accurately in Alok's skills, projects (TryThyEye, NumPy ANN, PhilGTP, Diffusion, HGR), and IIIT Bhubaneswar education.\n"
+        "4. Mention his email alokrtofc@gmail.com and the 'Download Resume' button if asked."
+    )
+    
+    payload = {
+        "model": "open-mistral-7b",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message}
+        ],
+        "temperature": 0.3,
+        "max_tokens": 400
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    
     try:
-        from langchain_mistralai import ChatMistralAI
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_core.output_parsers import StrOutputParser
-
-        llm = ChatMistralAI(
-            model="open-mistral-7b",
-            mistral_api_key=api_key,
-            temperature=0.3,
-            max_retries=2,
-            timeout=15
+        req = urllib.request.Request(
+            "https://api.mistral.ai/v1/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
         )
-
-        system_instructions = (
-            "You are 'Ask_ART', an intelligent, polite, and charismatic AI spirit guide and portfolio companion "
-            "for Alok Ranjan Tripathy (a Computer Science & Engineering undergraduate at IIIT Bhubaneswar).\n\n"
-            "Your mission: Answer questions from visitors, recruiters, and engineers about Alok's technical background, "
-            "engineering projects, skills, education, and achievements by fetching facts strictly from his official resume below.\n\n"
-            "=== ALOK'S OFFICIAL RESUME CONTEXT (ART_Resume-2.pdf) ===\n"
-            f"{RESUME_TEXT}\n"
-            "=========================================================\n\n"
-            "PORTFOLIO HIGHLIGHTS SUMMARY:\n"
-            "• TryThyEye: Real-time virtual sunglasses segmenter using SAM (Segment Anything) and YOLO with perspective warping\n"
-            "• Numpy_ANN_Mnist: Pure mathematical neural network built from scratch in NumPy with SGD & backprop (85%+ accuracy)\n"
-            "• PhilGTP: Philosophical conversational RAG system grounding responses in classic philosopher PDFs via LangChain\n"
-            "• MNIST_Diffusion: Denoising Diffusion Probabilistic Model (DDPM) UNet for image synthesis from noise\n"
-            "• HGR_Temple_Run: Real-time hand gesture recognition system interfacing OpenCV & MediaPipe for game navigation\n"
-            "• Emotion_Det: Unified multimodal perception pipeline combining facial landmarks, audio features, and NLP\n"
-            "• Education: B.Tech in Computer Science & Engineering at IIIT Bhubaneswar (Graduation: 2028)\n"
-            "• Contact: alokrtofc@gmail.com | github.com/ArtExists | linkedin.com/in/alok-ranjan-tripathy\n\n"
-            "RESPONSE GUIDELINES:\n"
-            "1. Be direct, concise, and structured (2 to 4 sentences or punchy bullet points).\n"
-            "2. Maintain a subtle, tasteful Japanese aesthetic spirit (e.g., occasional 'ようこそ (Welcome)', 'Konnichiwa', '⛩️', '🌸', '✨').\n"
-            "3. Ground all answers accurately in Alok's resume context.\n"
-            "4. If asked about downloading his resume or reaching out, mention his email (alokrtofc@gmail.com) and the 'Download Resume' button."
-        )
-
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_instructions),
-            ("human", "{question}")
-        ])
-
-        mistral_chain = prompt | llm | StrOutputParser()
+        with urllib.request.urlopen(req, timeout=9) as resp:
+            if resp.status == 200:
+                body = json.loads(resp.read().decode("utf-8"))
+                reply = body["choices"][0]["message"]["content"]
+                if reply and reply.strip():
+                    return reply.strip()
     except Exception:
-        mistral_chain = None
+        pass
+        
+    return get_fallback_answer(user_message)
 
 
 def get_fallback_answer(user_message: str) -> str:
@@ -125,31 +131,22 @@ def get_fallback_answer(user_message: str) -> str:
     return f"✨ Ask_ART received: '{user_message}'. Alok specializes in Computer Vision (SAM, YOLO), Generative AI (Diffusion, RAG), and Deep Learning at IIIT Bhubaneswar. Feel free to ask about his projects, skills, or contact info!"
 
 
-def generate_chat_response(user_message: str) -> str:
-    user_msg = (user_message or "").strip()
-    if not user_msg:
-        return "ようこそ! I am Ask_ART. Ask me anything about Alok's resume, AI projects, or engineering skills! ⛩️"
-
-    if mistral_chain is not None:
-        try:
-            response = mistral_chain.invoke({"question": user_msg})
-            if response and response.strip():
-                return response.strip()
-        except Exception:
-            pass
-
-    return get_fallback_answer(user_msg)
-
-
 class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps({"status": "healthy", "service": "Ask_ART Chatbot API"}).encode("utf-8"))
+
     def do_POST(self):
         try:
             content_length = int(self.headers.get("Content-Length", 0))
-            post_data = self.rfile.read(content_length)
+            post_data = self.rfile.read(content_length) if content_length > 0 else b"{}"
             data = json.loads(post_data.decode("utf-8")) if post_data else {}
             user_msg = data.get("message", "")
             
-            bot_reply = generate_chat_response(user_msg)
+            bot_reply = query_mistral_api(user_msg)
             response_data = {"reply": bot_reply}
             
             self.send_response(200)
@@ -158,11 +155,12 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode("utf-8"))
         except Exception as e:
-            self.send_response(500)
-            self.send_header("Content-Type", "application/json")
+            fallback = get_fallback_answer("")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+            self.wfile.write(json.dumps({"reply": fallback, "error": str(e)}, ensure_ascii=False).encode("utf-8"))
 
     def do_OPTIONS(self):
         self.send_response(200)
@@ -171,6 +169,6 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
-# Vercel entrypoint aliases
+# Vercel entrypoint exports
 app = handler
 application = handler

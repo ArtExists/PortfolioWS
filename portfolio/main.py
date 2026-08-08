@@ -2,95 +2,104 @@ import http.server
 import socketserver
 import json
 import os
-import dotenv
-import pypdf
+import urllib.request
 
-# Load API keys from local .env
-ENV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-dotenv.load_dotenv(ENV_PATH)
+# Load dotenv if running locally
+try:
+    import dotenv
+    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+except Exception:
+    pass
 
 PORT = 8000
 RESUME_PDF_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ART_Resume-2.pdf")
 
+# Extract resume text if PDF exists, otherwise fallback to built-in resume context
+RESUME_TEXT = """
+ALOK RANJAN TRIPATHY
+B.Tech in Computer Science and Engineering, IIIT Bhubaneswar (Expected: 2028)
+Email: alokrtofc@gmail.com | Phone: +91 7978631653
+GitHub: github.com/ArtExists | LinkedIn: linkedin.com/in/alok-ranjan-tripathy
 
+Skills:
+- Python, C, C++, Git, Jupyter, Streamlit, Flask
+- PyTorch, TensorFlow, scikit-learn, pure NumPy
+- OpenCV, MediaPipe, YOLO, Segment Anything (SAM)
+- LangChain, LangGraph, RAG, DDPM Diffusion
 
-RESUME_TEXT = ""
+Featured Projects:
+1. TryThyEye: Real-time virtual sunglasses try-on system leveraging SAM & YOLO with perspective warping.
+2. Numpy_ANN_Mnist: Built a fully connected Neural Network from scratch in pure mathematical NumPy with SGD & backprop (85%+ accuracy).
+3. PhilGTP: Philosophical conversational RAG system grounding responses in classic philosopher PDFs via LangChain & Mistral.
+4. MNIST_Diffusion: Denoising Diffusion Probabilistic Model (DDPM) built with a custom UNet for image synthesis from noise.
+5. HGR_Temple_Run: Real-time hand gesture recognition system interfacing OpenCV & MediaPipe for game navigation.
+6. Emotion_Det: Unified multimodal perception pipeline combining facial landmarks, audio features, and NLP.
+"""
+
 try:
     if os.path.exists(RESUME_PDF_PATH):
+        import pypdf
         reader = pypdf.PdfReader(RESUME_PDF_PATH)
-        extracted_pages = []
-        for i, page in enumerate(reader.pages):
-            page_text = page.extract_text()
-            if page_text:
-                extracted_pages.append(f"--- PAGE {i+1} ---\n{page_text.strip()}")
-        RESUME_TEXT = "\n\n".join(extracted_pages)
-        print(f"[Resume Loader] Successfully extracted {len(RESUME_TEXT)} characters from ART_Resume-2.pdf")
-    else:
-        print(f"[Resume Loader Warning] PDF not found at {RESUME_PDF_PATH}")
-except Exception as e:
-    print(f"[Resume Loader Error] Could not read PDF: {e}")
+        pages = [p.extract_text() for p in reader.pages if p.extract_text()]
+        if pages:
+            RESUME_TEXT = "\n\n".join(pages)
+except Exception:
+    pass
 
-# ----------------------------------------------------
-# 2. INITIALIZE LANGCHAIN WITH FREE MISTRAL AI MODEL
-# ----------------------------------------------------
-mistral_chain = None
-raw_key = os.getenv("MISTRAL_API_KEY", "")
-api_key = raw_key.strip().strip('"').strip("'") if raw_key else ""
-
-if api_key:
+def query_mistral_api(user_message: str) -> str:
+    raw_key = os.environ.get("MISTRAL_API_KEY", "")
+    api_key = raw_key.strip().strip('"').strip("'")
+    
+    if not api_key:
+        return get_fallback_answer(user_message)
+    
+    system_prompt = (
+        "You are 'Ask_ART', an intelligent, polite, and charismatic AI spirit guide and portfolio companion "
+        "for Alok Ranjan Tripathy (Computer Science undergraduate at IIIT Bhubaneswar).\n"
+        "Answer questions from visitors, recruiters, and engineers accurately based on Alok's resume below.\n\n"
+        f"{RESUME_TEXT}\n\n"
+        "GUIDELINES:\n"
+        "1. Be direct, concise, and structured (2-4 sentences or clean bullet points).\n"
+        "2. Add a tasteful subtle Japanese aesthetic spirit (e.g., 'ようこそ', 'Konnichiwa', '⛩️', '🌸', '✨').\n"
+        "3. Ground all answers accurately in Alok's skills, projects (TryThyEye, NumPy ANN, PhilGTP, Diffusion, HGR), and IIIT Bhubaneswar education.\n"
+        "4. Mention his email alokrtofc@gmail.com and the 'Download Resume' button if asked."
+    )
+    
+    payload = {
+        "model": "open-mistral-7b",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message}
+        ],
+        "temperature": 0.3,
+        "max_tokens": 400
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    
     try:
-        from langchain_mistralai import ChatMistralAI
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_core.output_parsers import StrOutputParser
-
-        # Use free Mistral model: open-mistral-7b (Mistral 7B)
-        llm = ChatMistralAI(
-            model="open-mistral-7b",
-            mistral_api_key=api_key,
-            temperature=0.3,
-            max_retries=2,
-            timeout=15
+        req = urllib.request.Request(
+            "https://api.mistral.ai/v1/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
         )
+        with urllib.request.urlopen(req, timeout=9) as resp:
+            if resp.status == 200:
+                body = json.loads(resp.read().decode("utf-8"))
+                reply = body["choices"][0]["message"]["content"]
+                if reply and reply.strip():
+                    return reply.strip()
+    except Exception:
+        pass
+        
+    return get_fallback_answer(user_message)
 
-        system_instructions = (
-            "You are 'Ask_ART', an intelligent, polite, and charismatic AI spirit guide and portfolio companion "
-            "for Alok Ranjan Tripathy (a Computer Science & Engineering undergraduate at IIIT Bhubaneswar).\n\n"
-            "Your mission: Answer questions from visitors, recruiters, and engineers about Alok's technical background, "
-            "engineering projects, skills, education, and achievements by fetching facts strictly from his official resume below.\n\n"
-            "=== ALOK'S OFFICIAL RESUME CONTEXT (ART_Resume-2.pdf) ===\n"
-            f"{RESUME_TEXT}\n"
-            "=========================================================\n\n"
-            "PORTFOLIO HIGHLIGHTS SUMMARY:\n"
-            "• TryThyEye: Real-time virtual sunglasses segmenter using SAM (Segment Anything) and YOLO with perspective warping\n"
-            "• Numpy_ANN_Mnist: Pure mathematical neural network built from scratch in NumPy with SGD & backprop (85%+ accuracy)\n"
-            "• PhilGTP: Philosophical conversational RAG system grounding responses in classic philosopher PDFs via LangChain\n"
-            "• MNIST_Diffusion: Denoising Diffusion Probabilistic Model (DDPM) UNet for image synthesis from noise\n"
-            "• HGR_Temple_Run: Real-time hand gesture recognition system interfacing OpenCV & MediaPipe for game navigation\n"
-            "• Emotion_Det: Unified multimodal perception pipeline combining facial landmarks, audio features, and NLP\n"
-            "• Education: B.Tech in Computer Science & Engineering at IIIT Bhubaneswar (Graduation: 2028)\n"
-            "• Contact: alokrtofc@gmail.com | github.com/ArtExists | linkedin.com/in/alok-ranjan-tripathy\n\n"
-            "RESPONSE GUIDELINES:\n"
-            "1. Be direct, concise, and structured (2 to 4 sentences or punchy bullet points).\n"
-            "2. Maintain a subtle, tasteful Japanese aesthetic spirit (e.g., occasional 'ようこそ (Welcome)', 'Konnichiwa', '⛩️', '🌸', '✨').\n"
-            "3. Ground all answers accurately in Alok's resume context.\n"
-            "4. If asked about downloading his resume or reaching out, mention his email (alokrtofc@gmail.com) and the 'Download Resume' button."
-        )
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_instructions),
-            ("human", "{question}")
-        ])
-
-        mistral_chain = prompt | llm | StrOutputParser()
-        print(f"[LangChain] Initialized Mistral AI with model 'open-mistral-7b' (Key: {api_key[:6]}...{api_key[-4:]})")
-    except Exception as e:
-        print(f"[LangChain Error] Could not initialize ChatMistralAI: {e}")
-else:
-    print("[LangChain Warning] No MISTRAL_API_KEY found in .env; will use built-in knowledge base.")
-
-# ----------------------------------------------------
-# 3. RULE-BASED FALLBACK KNOWLEDGE BASE (ZERO DOWNTIME)
-# ----------------------------------------------------
 def get_fallback_answer(user_message: str) -> str:
     msg = (user_message or "").lower().strip()
     if not msg:
@@ -128,41 +137,27 @@ def get_fallback_answer(user_message: str) -> str:
 
     return f"✨ Ask_ART received: '{user_message}'. Alok specializes in Computer Vision (SAM, YOLO), Generative AI (Diffusion, RAG), and Deep Learning at IIIT Bhubaneswar. Feel free to ask about his projects, skills, or contact info!"
 
-# ----------------------------------------------------
-# 4. CHAT QUERY DISPATCHER (LANGCHAIN MISTRAL + FALLBACK)
-# ----------------------------------------------------
-def generate_chat_response(user_message: str) -> str:
-    user_msg = (user_message or "").strip()
-    if not user_msg:
-        return "ようこそ! I am Ask_ART. Ask me anything about Alok's resume, AI projects, or engineering skills! ⛩️"
 
-    if mistral_chain is not None:
-        try:
-            print(f"[Mistral Query] Prompting LangChain Mistral for: '{user_msg}'")
-            response = mistral_chain.invoke({"question": user_msg})
-            if response and response.strip():
-                return response.strip()
-        except Exception as e:
-            print(f"[Mistral API Error] Falling back to knowledge base: {e}")
-
-    # Fallback to smart knowledge base if offline or API error
-    return get_fallback_answer(user_msg)
-
-# ----------------------------------------------------
-# 5. HTTP SERVER & REST API HANDLER
-# ----------------------------------------------------
 class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/api/chat":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "healthy", "service": "Ask_ART Chatbot API"}).encode("utf-8"))
+        else:
+            super().do_GET()
+
     def do_POST(self):
         if self.path == "/api/chat":
-            content_length = int(self.headers.get("Content-Length", 0))
-            post_data = self.rfile.read(content_length)
-            
             try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                post_data = self.rfile.read(content_length) if content_length > 0 else b"{}"
                 data = json.loads(post_data.decode("utf-8")) if post_data else {}
                 user_msg = data.get("message", "")
                 
-                # Fetch answer via LangChain Mistral AI + Resume Context
-                bot_reply = generate_chat_response(user_msg)
+                bot_reply = query_mistral_api(user_msg)
                 response_data = {"reply": bot_reply}
                 
                 self.send_response(200)
@@ -171,10 +166,11 @@ class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode("utf-8"))
             except Exception as e:
-                self.send_response(500)
-                self.send_header("Content-Type", "application/json")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
-                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                self.wfile.write(json.dumps({"reply": get_fallback_answer(""), "error": str(e)}).encode("utf-8"))
         else:
             self.send_error(404, "Endpoint Not Found")
 
@@ -182,7 +178,10 @@ class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-# Vercel Serverless Function Entrypoint Exports
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+# Vercel entrypoint exports
 handler = PortfolioRequestHandler
 app = PortfolioRequestHandler
 application = PortfolioRequestHandler
@@ -192,7 +191,7 @@ if __name__ == "__main__":
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), PortfolioRequestHandler) as httpd:
         print(f"Portfolio Server running at http://localhost:{PORT}")
-        print(f"Chat API Endpoint: http://localhost:{PORT}/api/chat (LangChain Mistral Powered)")
+        print(f"Chat API Endpoint: http://localhost:{PORT}/api/chat (Mistral Powered)")
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
