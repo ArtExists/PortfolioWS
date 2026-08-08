@@ -12,9 +12,8 @@ dotenv.load_dotenv(ENV_PATH)
 PORT = 8000
 RESUME_PDF_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ART_Resume-2.pdf")
 
-# ----------------------------------------------------
-# 1. EXTRACT TEXT FROM RESUME PDF (ART_Resume-2.pdf)
-# ----------------------------------------------------
+
+
 RESUME_TEXT = ""
 try:
     if os.path.exists(RESUME_PDF_PATH):
