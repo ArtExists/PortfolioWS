@@ -1,0 +1,2805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alok Ranjan Tripathy (ART) — 創造 · Vision & GenAI Portfolio</title>
+  <meta name="description"
+    content="Portfolio of Alok Ranjan Tripathy — Computer Science Undergrad at IIIT Bhubaneswar specializing in Computer Vision, SAM, YOLO, Deep Learning, and GenAI RAG systems.">
+
+  <!-- Google Fonts: Old Japanese Calligraphy & Classical Serif Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Yuji+Boku&family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Serif+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --ink-bg: #07090e;
+      --surface: #0d111a;
+      --surface-2: #131926;
+      --surface-glass: rgba(13, 17, 26, 0.82);
+      --line: #1e2638;
+      --line-gold: rgba(229, 193, 88, 0.35);
+      --text: #f0f4f8;
+      --text-sub: #cbd5e1;
+      --muted: #7e8c9f;
+      --gold: #e5c158;
+      --gold-bright: #ffd700;
+      --gold-glow: rgba(229, 193, 88, 0.25);
+      --vermilion: #e05353;
+      --vermilion-glow: rgba(224, 83, 83, 0.35);
+      --sakura: #ffb7c5;
+      --sakura-deep: #f48fb1;
+      --sakura-glow: rgba(255, 183, 197, 0.35);
+      --cyan: #22d3ee;
+      --jade: #4ade80;
+      --violet: #a78bfa;
+
+      /* Typography Tokens */
+      --font-kanji: 'Yuji Boku', serif;
+      --font-display: 'Shippori Mincho', 'Cinzel Decorative', serif;
+      --font-body: 'Noto Serif JP', 'Plus Jakarta Sans', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--ink-bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Custom Cursor Styles */
+    @media (pointer: fine) {
+      body {
+        cursor: none;
+      }
+
+      a,
+      button,
+      input,
+      .proj-card,
+      .sugg-chip,
+      .spirit-bot-wrap,
+      .hanko-seal {
+        cursor: none;
+      }
+    }
+
+    #cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      background-color: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 12px var(--gold-bright);
+    }
+
+    #cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(229, 193, 88, 0.45);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease-out, width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
+    }
+
+    body.hovering #cursor-dot {
+      width: 12px;
+      height: 12px;
+      background-color: var(--sakura);
+      box-shadow: 0 0 16px var(--sakura-glow);
+    }
+
+    body.hovering #cursor-ring {
+      width: 52px;
+      height: 52px;
+      border-color: rgba(255, 183, 197, 0.7);
+      background: rgba(255, 183, 197, 0.06);
+    }
+
+    /* Falling Cherry Blossoms Canvas Background */
+    #sakura-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Traditional Seigaiha / Washi Ink Overlay */
+    .washi-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(224, 83, 83, 0.07), transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(229, 193, 88, 0.06), transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(255, 183, 197, 0.05), transparent 45%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    }
+
+    /* Background Watermark Vertical Kanji (Japanese Vibe) */
+    .bg-kanji-watermark {
+      position: fixed;
+      font-family: var(--font-kanji);
+      font-size: clamp(80px, 16vw, 220px);
+      color: rgba(255, 255, 255, 0.018);
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      user-select: none;
+      pointer-events: none;
+      z-index: 0;
+      line-height: 1;
+      letter-spacing: 0.25em;
+    }
+
+    .bg-kanji-1 {
+      top: 12%;
+      right: 3%;
+    }
+
+    .bg-kanji-2 {
+      top: 45%;
+      left: 2%;
+    }
+
+    /* Hanko Seal Stamp (Traditional Japanese Red Stamp) */
+    .hanko-seal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--vermilion);
+      border-radius: 4px;
+      color: var(--vermilion);
+      font-family: var(--font-kanji);
+      font-size: 16px;
+      font-weight: 700;
+      background: rgba(224, 83, 83, 0.08);
+      box-shadow: 0 0 10px rgba(224, 83, 83, 0.25), inset 0 0 4px rgba(224, 83, 83, 0.15);
+      position: relative;
+      user-select: none;
+      transform: rotate(-3deg);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      vertical-align: middle;
+    }
+
+    .hanko-seal:hover {
+      transform: rotate(0deg) scale(1.08);
+      box-shadow: 0 0 16px rgba(224, 83, 83, 0.5);
+    }
+
+    .hanko-seal.sm {
+      width: 24px;
+      height: 24px;
+      font-size: 13px;
+      border-width: 1.5px;
+    }
+
+    /* Reveal animations on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---------- NAVIGATION ---------- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(7, 9, 14, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      transition: border-color 0.3s ease;
+    }
+
+    nav::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-glow), var(--vermilion-glow), transparent);
+    }
+
+    .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 16px;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo-text span.accent {
+      color: var(--gold);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      transition: color .25s, text-shadow .25s;
+      position: relative;
+      padding: 6px 0;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold);
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.25s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-resume-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      padding: 7px 16px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      background: rgba(229, 193, 88, 0.08);
+      border-radius: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .nav-resume-btn:hover {
+      background: var(--gold);
+      color: #07090e;
+      box-shadow: 0 4px 18px var(--gold-glow);
+      transform: translateY(-1px);
+    }
+
+    /* ---------- SECTION LAYOUT ---------- */
+    section {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 120px 48px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .eyebrow-kanji {
+      font-family: var(--font-kanji);
+      font-size: 14px;
+      color: var(--vermilion);
+      border-right: 1px solid var(--line);
+      padding-right: 10px;
+    }
+
+    .eyebrow::before {
+      content: '⛩️';
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    /* Japanese Torii & Cloud Decorative Divider */
+    .torii-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 40px 0;
+      opacity: 0.45;
+    }
+
+    .torii-divider .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line-gold), transparent);
+    }
+
+    /* ---------- HERO SECTION ---------- */
+    .hero {
+      min-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 50px;
+      position: relative;
+    }
+
+    .hero-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(13, 17, 26, 0.75);
+      border: 1px solid var(--line);
+      padding: 6px 14px;
+      border-radius: 2px;
+    }
+
+    .hero-tag .bracket {
+      color: var(--vermilion);
+      font-weight: 700;
+    }
+
+    .hero-tag .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--jade);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--jade);
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .hero h1 {
+      font-size: clamp(44px, 7.5vw, 92px);
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      position: relative;
+      font-family: var(--font-display);
+    }
+
+    .hero h1 .name-kanji {
+      font-family: var(--font-kanji);
+      font-size: 0.4em;
+      color: var(--vermilion);
+      vertical-align: super;
+      margin-left: 12px;
+      opacity: 0.85;
+      letter-spacing: 0.08em;
+    }
+
+    .hero h1 .accent {
+      color: var(--gold);
+      background: linear-gradient(135deg, #ffd700, #e5c158, #ff8fa3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(229, 193, 88, 0.25);
+    }
+
+    .hero-sub {
+      max-width: 640px;
+      color: var(--text-sub);
+      font-size: 18px;
+      line-height: 1.75;
+      margin-bottom: 36px;
+      font-weight: 400;
+    }
+
+    .hero-sub strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 44px;
+    }
+
+    .det-tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 7px 14px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: var(--surface);
+      position: relative;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .det-tag .tag-kanji {
+      color: var(--gold);
+      font-family: var(--font-kanji);
+      font-size: 13px;
+    }
+
+    .det-tag:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--gold-glow);
+    }
+
+    .det-tag::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 6px;
+      height: 6px;
+      border-top: 1px solid var(--gold);
+      border-left: 1px solid var(--gold);
+    }
+
+    .det-tag::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 6px;
+      height: 6px;
+      border-bottom: 1px solid var(--gold);
+      border-right: 1px solid var(--gold);
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      letter-spacing: 0.04em;
+      padding: 14px 28px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      background: transparent;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background: rgba(229, 193, 88, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--gold-glow);
+    }
+
+    .btn-solid {
+      background: linear-gradient(135deg, #e5c158, #dfa248);
+      color: #07090e;
+      font-weight: 600;
+      border-color: var(--gold);
+    }
+
+    .btn-solid:hover {
+      background: linear-gradient(135deg, #ffd700, #e5c158);
+      color: #000;
+      box-shadow: 0 8px 26px rgba(229, 193, 88, 0.4);
+    }
+
+    .btn-vermilion {
+      border-color: var(--vermilion);
+      color: var(--vermilion);
+    }
+
+    .btn-vermilion:hover {
+      background: rgba(224, 83, 83, 0.15);
+      box-shadow: 0 8px 24px var(--vermilion-glow);
+      color: #ff7575;
+    }
+
+    /* ---------- ABOUT SECTION ---------- */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 60px;
+    }
+
+    @media(max-width:850px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .about-text p {
+      color: var(--text-sub);
+      margin-bottom: 20px;
+      font-size: 16.5px;
+      line-height: 1.8;
+    }
+
+    .about-text strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .about-callout {
+      border-left: 2px solid var(--gold);
+      padding: 12px 18px;
+      background: rgba(229, 193, 88, 0.04);
+      margin: 20px 0;
+      font-size: 15px;
+      color: var(--text-sub);
+    }
+
+    .skill-block {
+      margin-bottom: 24px;
+    }
+
+    .skill-block h4 {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .skill-block h4 .kanji-badge {
+      font-family: var(--font-kanji);
+      color: var(--vermilion);
+      font-size: 13px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.22s ease;
+      border-radius: 2px;
+    }
+
+    .pill:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--gold-glow);
+    }
+
+    /* ---------- PROJECTS SECTION ---------- */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(30px, 4.5vw, 44px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .count {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 13px;
+      background: rgba(229, 193, 88, 0.08);
+      border: 1px solid var(--line-gold);
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
+
+    .proj-card {
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      padding: 36px;
+      margin-bottom: 32px;
+      transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .proj-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 24px var(--gold-glow);
+    }
+
+    /* Scroll Frame Corners (Old Japanese Aesthetic) */
+    .proj-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 16px;
+      height: 16px;
+      border-top: 2px solid var(--gold);
+      border-left: 2px solid var(--gold);
+      transition: border-color .25s, width .25s, height .25s;
+    }
+
+    .proj-card::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 16px;
+      height: 16px;
+      border-bottom: 2px solid var(--gold);
+      border-right: 2px solid var(--gold);
+      transition: border-color .25s, width .25s, height .25s;
+    }
+
+    .proj-card:hover::before,
+    .proj-card:hover::after {
+      width: 24px;
+      height: 24px;
+      border-color: var(--gold-bright);
+    }
+
+    .proj-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .proj-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .proj-title {
+      font-family: var(--font-display);
+      font-size: 23px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .conf {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+      border: 1px solid var(--line-gold);
+      padding: 4px 10px;
+      white-space: nowrap;
+      background: rgba(229, 193, 88, 0.06);
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .proj-desc {
+      color: var(--text-sub);
+      font-size: 15.5px;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    .proj-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .stack-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .stack-chip {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text);
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: 2px;
+    }
+
+    .proj-repo-link {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border: 1px solid var(--line-gold);
+      background: rgba(229, 193, 88, 0.05);
+      border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+
+    .proj-repo-link:hover {
+      color: #07090e;
+      background: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 4px 16px var(--gold-glow);
+      transform: translateX(3px);
+    }
+
+    /* ---------- EXPERIENCE SECTION ---------- */
+    .exp-item {
+      display: flex;
+      gap: 32px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line);
+      transition: background 0.2s;
+    }
+
+    .exp-item:last-child {
+      border-bottom: none;
+    }
+
+    .exp-date {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      min-width: 100px;
+      padding-top: 4px;
+      font-weight: 600;
+    }
+
+    .exp-body h4 {
+      font-size: 19px;
+      margin-bottom: 4px;
+      font-family: var(--font-display);
+    }
+
+    .exp-body .role {
+      color: var(--vermilion);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      margin-bottom: 10px;
+      display: block;
+      letter-spacing: 0.03em;
+    }
+
+    .exp-body p {
+      color: var(--text-sub);
+      font-size: 15px;
+    }
+
+    /* ---------- CONTACT SECTION ---------- */
+    .contact-box {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      padding: 56px 48px;
+      text-align: center;
+      position: relative;
+      border-radius: 2px;
+    }
+
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 20px;
+      height: 20px;
+      border-top: 2px solid var(--vermilion);
+      border-left: 2px solid var(--vermilion);
+    }
+
+    .contact-box::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 20px;
+      height: 20px;
+      border-bottom: 2px solid var(--vermilion);
+      border-right: 2px solid var(--vermilion);
+    }
+
+    .contact-box h2 {
+      font-size: clamp(28px, 4.5vw, 42px);
+      margin-bottom: 16px;
+    }
+
+    .contact-box p {
+      color: var(--text-sub);
+      font-size: 16.5px;
+      margin-bottom: 36px;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    footer {
+      text-align: center;
+      padding: 48px 24px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: rgba(7, 9, 14, 0.95);
+      position: relative;
+      z-index: 2;
+    }
+
+    footer .footer-kanji {
+      font-family: var(--font-kanji);
+      color: var(--vermilion);
+      font-size: 14px;
+      margin-left: 6px;
+    }
+
+    /* ---------------------------------------------------- */
+    /* INTERACTIVE ROAMING SPIRIT BOT COMPANION (KITSUNE BOT) */
+    /* ---------------------------------------------------- */
+    #spirit-bot-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      pointer-events: none;
+      /* Movement handled smoothly in JS */
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+      user-select: none;
+    }
+
+    .spirit-bot-wrap {
+      position: relative;
+      width: 74px;
+      height: 74px;
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Floating bobbing & breathing physics */
+    .spirit-bot-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      animation: spiritBob 3.5s ease-in-out infinite alternate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes spiritBob {
+      0% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-8px) rotate(2deg);
+      }
+
+      100% {
+        transform: translateY(4px) rotate(-2deg);
+      }
+    }
+
+    /* Glowing aura behind spirit bot */
+    .spirit-aura {
+      position: absolute;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(229, 193, 88, 0.35) 0%, rgba(224, 83, 83, 0.15) 50%, transparent 75%);
+      filter: blur(8px);
+      animation: auraPulse 2.8s ease-in-out infinite alternate;
+      z-index: 1;
+    }
+
+    @keyframes auraPulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scale(1.25);
+        opacity: 1;
+      }
+    }
+
+    /* Spirit Bot SVG Visuals */
+    .spirit-svg {
+      width: 64px;
+      height: 64px;
+      z-index: 2;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6));
+      transition: transform 0.2s ease;
+    }
+
+    /* Floating Ofuda Talisman attached to bot */
+    .spirit-talisman {
+      position: absolute;
+      bottom: -4px;
+      right: 4px;
+      width: 18px;
+      height: 28px;
+      background: #fdf6e2;
+      border: 1px solid #c29d38;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-kanji);
+      font-size: 11px;
+      color: #b83b3b;
+      font-weight: 700;
+      transform-origin: top center;
+      animation: talismanFlutter 2.2s ease-in-out infinite alternate;
+      z-index: 3;
+      border-radius: 1px;
+    }
+
+    @keyframes talismanFlutter {
+      0% {
+        transform: rotate(-8deg);
+      }
+
+      100% {
+        transform: rotate(18deg);
+      }
+    }
+
+    /* Floating Shadow underneath */
+    .spirit-shadow {
+      position: absolute;
+      bottom: -10px;
+      width: 42px;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 50%;
+      filter: blur(4px);
+      animation: shadowScale 3.5s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes shadowScale {
+      0% {
+        transform: scale(1);
+        opacity: 0.4;
+      }
+
+      50% {
+        transform: scale(0.8);
+        opacity: 0.2;
+      }
+
+      100% {
+        transform: scale(1.1);
+        opacity: 0.5;
+      }
+    }
+
+    /* Speech Bubble / Dialogue Balloon */
+    .spirit-bubble {
+      position: absolute;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.92);
+      opacity: 0;
+      pointer-events: none;
+      width: 250px;
+      background: var(--surface);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 18px var(--gold-glow);
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+    }
+
+    .spirit-bubble.active {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      pointer-events: auto;
+    }
+
+    .spirit-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: var(--surface);
+      border-right: 1px solid var(--gold);
+      border-bottom: 1px solid var(--gold);
+    }
+
+    .bubble-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 4px;
+    }
+
+    .bubble-header .bot-name {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    .bubble-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 0 4px;
+      line-height: 1;
+    }
+
+    .bubble-close:hover {
+      color: var(--vermilion);
+    }
+
+    .bubble-text {
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .bubble-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-bg);
+      background: var(--gold);
+      padding: 4px 10px;
+      border-radius: 2px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      transition: background 0.2s ease;
+    }
+
+    .bubble-cta:hover {
+      background: var(--gold-bright);
+    }
+
+    /* Target Pointer Arrow for Spirit Bot */
+    .spirit-pointer-arrow {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 16px solid var(--gold);
+      filter: drop-shadow(0 0 6px var(--gold-glow));
+      top: -24px;
+      left: calc(50% - 8px);
+      opacity: 0;
+      transform-origin: bottom center;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      animation: pointerBounce 1.2s ease-in-out infinite alternate;
+    }
+
+    .spirit-pointer-arrow.active {
+      opacity: 1;
+    }
+
+    @keyframes pointerBounce {
+      0% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(-6px);
+      }
+    }
+
+    /* Bot expressions (eyes / smile) */
+    .bot-eyes {
+      transition: all 0.2s ease;
+    }
+
+    /* Startled animation class */
+    .spirit-bot-wrap.startled .spirit-svg {
+      animation: startledWiggle 0.4s ease;
+    }
+
+    @keyframes startledWiggle {
+
+      0%,
+      100% {
+        transform: scale(1.1) rotate(0deg);
+      }
+
+      25% {
+        transform: scale(1.15) rotate(-10deg);
+      }
+
+      75% {
+        transform: scale(1.15) rotate(10deg);
+      }
+    }
+
+    .spirit-bot-wrap.spin-celebrate {
+      animation: spiritSpin 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes spiritSpin {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+
+      50% {
+        transform: rotate(180deg) scale(1.3);
+      }
+
+      100% {
+        transform: rotate(360deg) scale(1);
+      }
+    }
+
+    /* ---------- CHAT PANEL & TOGGLE ---------- */
+    #chat-toggle {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 100;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd700, #e5c158);
+      color: #07090e;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
+      animation: chatPulse 2.8s infinite;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    #chat-toggle:hover {
+      transform: scale(1.08) rotate(5deg);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 28px var(--gold-bright);
+    }
+
+    @keyframes chatPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(229, 193, 88, 0.45), 0 8px 28px rgba(0, 0, 0, 0.5);
+      }
+
+      70% {
+        box-shadow: 0 0 0 16px rgba(229, 193, 88, 0), 0 8px 28px rgba(0, 0, 0, 0.5);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(229, 193, 88, 0), 0 8px 28px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    #chat-panel {
+      position: fixed;
+      bottom: 104px;
+      right: 28px;
+      z-index: 100;
+      width: 390px;
+      max-width: calc(100vw - 36px);
+      height: 560px;
+      max-height: calc(100vh - 140px);
+      background: var(--surface);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(18px) scale(0.97);
+      pointer-events: none;
+      transition: opacity .25s cubic-bezier(0.16, 1, 0.3, 1), transform .25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 28px var(--gold-glow);
+    }
+
+    #chat-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    .chat-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .chat-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--jade);
+      box-shadow: 0 0 10px var(--jade);
+    }
+
+    .chat-head-text {
+      flex: 1;
+    }
+
+    .chat-head-text .name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-head-text .status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+    }
+
+    .chat-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      padding: 4px 6px;
+      transition: color .2s;
+    }
+
+    .chat-close:hover {
+      color: var(--vermilion);
+    }
+
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chat-body::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb {
+      background: var(--line-gold);
+      border-radius: 3px;
+    }
+
+    .msg {
+      max-width: 86%;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 11px 15px;
+      font-family: var(--font-body);
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 2px 10px 10px 10px;
+      color: var(--text);
+    }
+
+    .msg.bot strong {
+      color: var(--gold);
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: rgba(229, 193, 88, 0.14);
+      border: 1px solid var(--line-gold);
+      color: var(--text);
+      border-radius: 10px 2px 10px 10px;
+    }
+
+    .msg.typing {
+      align-self: flex-start;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 18px 14px;
+    }
+
+    .sugg-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+      border: 1px solid var(--line-gold);
+      padding: 5px 10px;
+      background: rgba(229, 193, 88, 0.05);
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+
+    .sugg-chip:hover {
+      background: rgba(229, 193, 88, 0.16);
+      border-color: var(--gold);
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: 0 0 4px 4px;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: var(--ink-bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 10px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      border-radius: 2px;
+    }
+
+    #chat-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    #chat-send {
+      background: var(--gold);
+      border: none;
+      color: #07090e;
+      width: 42px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 2px;
+      transition: background 0.2s ease;
+    }
+
+    #chat-send:hover {
+      background: var(--gold-bright);
+    }
+
+    #chat-send:disabled {
+      opacity: 0.5;
+    }
+
+    /* ---------- TOP-RIGHT AUDIO CONTROL BUTTON ---------- */
+    .audio-control-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      padding: 7px 14px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      background: rgba(229, 193, 88, 0.08);
+      border-radius: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+
+    .audio-control-btn:hover {
+      background: rgba(229, 193, 88, 0.2);
+      box-shadow: 0 0 14px var(--gold-glow);
+      transform: translateY(-1px);
+    }
+
+    .audio-control-btn.muted {
+      border-color: var(--line);
+      color: var(--muted);
+      background: rgba(13, 17, 26, 0.7);
+    }
+
+    .audio-control-btn.muted:hover {
+      border-color: var(--vermilion);
+      color: var(--vermilion);
+      background: rgba(224, 83, 83, 0.1);
+    }
+
+    /* Animated Soundwave Equalizer Bars */
+    .audio-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+      width: 14px;
+    }
+
+    .audio-bars .bar {
+      width: 2px;
+      background-color: var(--gold);
+      border-radius: 1px;
+      animation: soundBarPulse 1.2s ease-in-out infinite alternate;
+    }
+
+    .audio-bars .bar-1 {
+      height: 40%;
+      animation-delay: 0.1s;
+    }
+
+    .audio-bars .bar-2 {
+      height: 80%;
+      animation-delay: 0.3s;
+    }
+
+    .audio-bars .bar-3 {
+      height: 100%;
+      animation-delay: 0.2s;
+    }
+
+    .audio-bars .bar-4 {
+      height: 50%;
+      animation-delay: 0.4s;
+    }
+
+    .audio-control-btn.muted .audio-bars .bar {
+      animation: none;
+      height: 3px;
+      background-color: var(--muted);
+    }
+
+    @keyframes soundBarPulse {
+      0% {
+        height: 25%;
+      }
+
+      50% {
+        height: 100%;
+      }
+
+      100% {
+        height: 40%;
+      }
+    }
+
+    /* Responsive Queries */
+    @media(max-width:768px) {
+      nav {
+        padding: 14px 18px;
+      }
+
+      .nav-links {
+        gap: 12px;
+      }
+
+      .nav-links a {
+        font-size: 11.5px;
+      }
+
+      .audio-label {
+        display: none;
+      }
+
+      section {
+        padding: 80px 20px;
+      }
+
+      .proj-card {
+        padding: 24px 20px;
+      }
+
+      .contact-box {
+        padding: 40px 20px;
+      }
+
+      #chat-panel {
+        right: 18px;
+        bottom: 96px;
+        width: calc(100vw - 36px);
+      }
+
+      #chat-toggle {
+        right: 18px;
+        bottom: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background Music Audio Element (Autoplay by default) -->
+  <audio id="bg-audio" autoplay loop preload="auto" src="bg_music.mp3"></audio>
+
+  <!-- Custom Interactive Cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Dynamic Falling Cherry Blossoms Canvas Particle Engine -->
+  <canvas id="sakura-canvas"></canvas>
+
+  <!-- Traditional Washi Ink Texture Overlay -->
+  <div class="washi-overlay"></div>
+
+  <!-- Subtle Japanese Kanji Background Watermarks -->
+  <div class="bg-kanji-watermark bg-kanji-1">電脳視覚</div>
+  <div class="bg-kanji-watermark bg-kanji-2">知能創造</div>
+
+  <!-- NAVIGATION WITH TOP-RIGHT MUSIC TOGGLE -->
+  <nav>
+    <a href="#top" class="logo-box">
+      <span class="hanko-seal">創</span>
+      <div class="logo-text">ART<span class="accent">_</span>PORTFOLIO</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Track Record</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li>
+        <a class="nav-resume-btn" href="ART_Resume-2.pdf" target="_blank" rel="noopener">
+          <span>Resume</span> 📄
+        </a>
+      </li>
+      <li>
+        <!-- Top Right Moon Festival OST Loop Button -->
+        <button id="audio-toggle" class="audio-control-btn" onclick="toggleAudio()"
+          aria-label="Toggle Moon Festival Background Music"
+          title="Moon Festival 2025 (Brawl Stars OST) · Click to Toggle">
+          <div class="audio-bars" id="audio-bars">
+            <span class="bar bar-1"></span>
+            <span class="bar bar-2"></span>
+            <span class="bar bar-3"></span>
+            <span class="bar bar-4"></span>
+          </div>
+          <span class="audio-label" id="audio-label">OST: Playing</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="top">
+    <div class="hero-badge-row">
+      <div class="hero-tag">
+        <span class="status-dot"></span>
+        <span class="bracket">[</span>CS_UNDERGRAD · IIIT_BHUBANESWAR<span class="bracket">]</span>
+      </div>
+      <span class="hanko-seal sm">術</span>
+    </div>
+
+    <h1>Alok Ranjan<br>Tripa<span class="accent">thy</span><span class="name-kanji">三千世界</span></h1>
+
+    <p class="hero-sub">
+      I build autonomous systems that <strong>see, understand, and reason</strong> — from real-time segmentation and
+      diffusion models to retrieval-grounded LLM architectures. Currently studying Computer Science at <strong>IIIT
+        Bhubaneswar</strong>, expected 2028.
+    </p>
+
+    <div class="hero-tags">
+      <span class="det-tag"><span class="tag-kanji">眼</span> COMPUTER_VISION · 0.94</span>
+      <span class="det-tag"><span class="tag-kanji">脳</span> DEEP_LEARNING · 0.91</span>
+      <span class="det-tag"><span class="tag-kanji">文</span> GENAI_RAG · 0.89</span>
+    </div>
+
+    <div class="hero-cta">
+      <button class="btn btn-solid" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">
+        <span>Explore Projects</span> ⛩️
+      </button>
+      <button class="btn" onclick="openChat()">
+        <span>Consult Ask_ART</span> →
+      </button>
+      <a class="btn btn-vermilion" href="ART_Resume-2.pdf" target="_blank" rel="noopener">
+        <span>Download CV</span> 📜
+      </a>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="reveal">
+    <div class="eyebrow">
+      <span class="eyebrow-kanji">概要</span>
+      01 · Philosophy &amp; Background
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>I am a Computer Science undergraduate at <strong>IIIT Bhubaneswar</strong> (Class of 2028), operating at the
+          nexus of <strong>computer perception</strong>, <strong>neural architectures</strong>, and <strong>generative
+            reasoning</strong>.</p>
+        <p>Most of my projects begin with a fundamental challenge: <em>"How do we teach machines to genuinely perceive
+            and interact with the physical world?"</em> — whether it is segmenting facial features in real-time for
+          virtual eyewear, tracking hand gestures for zero-latency game control, or strictly grounding LLM responses
+          within source texts.</p>
+
+        <div class="about-callout">
+          <strong>Applied Experience:</strong> Completed a virtual AI &amp; Data Analytics job simulation with
+          <strong>Tata
+            iQ</strong> via Forage in 2025, exploring industry-grade analytics and predictive modeling pipelines.
+        </div>
+      </div>
+
+      <div class="about-skills">
+        <div class="skill-block">
+          <h4><span class="kanji-badge">語</span> Core Languages</h4>
+          <div class="pill-row">
+            <span class="pill">Python</span>
+            <span class="pill">C</span>
+            <span class="pill">C++</span>
+            <span class="pill">SQL</span>
+          </div>
+        </div>
+
+        <div class="skill-block">
+          <h4><span class="kanji-badge">機</span> Deep Learning &amp; AI</h4>
+          <div class="pill-row">
+            <span class="pill">PyTorch</span>
+            <span class="pill">TensorFlow</span>
+            <span class="pill">scikit-learn</span>
+            <span class="pill">NumPy (First Principles)</span>
+          </div>
+        </div>
+
+        <div class="skill-block">
+          <h4><span class="kanji-badge">視</span> Computer Vision</h4>
+          <div class="pill-row">
+            <span class="pill">OpenCV</span>
+            <span class="pill">MediaPipe</span>
+            <span class="pill">YOLO</span>
+            <span class="pill">Segment Anything (SAM)</span>
+          </div>
+        </div>
+
+        <div class="skill-block">
+          <h4><span class="kanji-badge">創</span> GenAI &amp; RAG</h4>
+          <div class="pill-row">
+            <span class="pill">LangChain</span>
+            <span class="pill">LangGraph</span>
+            <span class="pill">Vector Stores</span>
+            <span class="pill">Diffusion (DDPM)</span>
+          </div>
+        </div>
+
+        <div class="skill-block">
+          <h4><span class="kanji-badge">具</span> Development Tools</h4>
+          <div class="pill-row">
+            <span class="pill">Git</span>
+            <span class="pill">Jupyter</span>
+            <span class="pill">Streamlit</span>
+            <span class="pill">Flask</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS SECTION -->
+  <section id="projects" class="reveal">
+    <div class="eyebrow">
+      <span class="eyebrow-kanji">作品</span>
+      02 · Selected Works
+    </div>
+    <div class="section-head">
+      <h2>Featured AI Systems <span class="hanko-seal sm">智</span></h2>
+      <span class="count">6 Systems Deployed</span>
+    </div>
+
+    <!-- Project 1: TryThyEye -->
+    <div class="proj-card" id="card-trythyeye">
+      <div class="proj-top">
+        <div class="proj-title-wrap">
+          <div class="proj-title">TryThyEye</div>
+          <span class="hanko-seal sm">眼</span>
+        </div>
+        <span class="conf">SAM + YOLO + OPENCV</span>
+      </div>
+      <p class="proj-desc">Ever wished to wear your friend's sunglasses and see if they look good on you? A computer
+        vision pipeline that segments, extracts, and overlays sunglasses onto faces in real-time using SAM, YOLO, and
+        MediaPipe landmark orientation.</p>
+      <div class="proj-footer">
+        <div class="stack-row">
+          <span class="stack-chip">Segment Anything (SAM)</span>
+          <span class="stack-chip">YOLO</span>
+          <span class="stack-chip">MediaPipe</span>
+          <span class="stack-chip">OpenCV</span>
+        </div>
+        <a class="proj-repo-link" href="https://github.com/ArtExists/TryThyEye" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          View Repo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 2: Numpy_ANN_Mnist -->
+    <div class="proj-card" id="card-numpy">
+      <div class="proj-top">
+        <div class="proj-title-wrap">
+          <div class="proj-title">Numpy_ANN_Mnist</div>
+          <span class="hanko-seal sm">算</span>
+        </div>
+        <span class="conf">NUMPY ONLY · 85+% ACC</span>
+      </div>
+      <p class="proj-desc">Engineered an Artificial Neural Network from pure mathematical first principles in NumPy
+        without any high-level DL framework. Features explicit forward propagation, gradient calculus, backpropagation,
+        and SGD optimizations on the MNIST dataset.</p>
+      <div class="proj-footer">
+        <div class="stack-row">
+          <span class="stack-chip">NumPy</span>
+          <span class="stack-chip">MNIST</span>
+          <span class="stack-chip">Backpropagation</span>
+          <span class="stack-chip">Gradient Descent</span>
+        </div>
+        <a class="proj-repo-link" href="https://github.com/ArtExists/Numpy_ANN_Mnist" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          View Repo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 3: PhilGTP -->
+    <div class="proj-card" id="card-philgtp">
+      <div class="proj-top">
+        <div class="proj-title-wrap">
+          <div class="proj-title">PhilGTP</div>
+          <span class="hanko-seal sm">文</span>
+        </div>
+        <span class="conf">LLM + RAG + LANGCHAIN</span>
+      </div>
+      <p class="proj-desc">A conversational intelligence engine that synthesizes philosophical dialogues grounded
+        strictly in canonical philosophical treatises through Retrieval-Augmented Generation (RAG), vector embeddings,
+        and LangChain chains.</p>
+      <div class="proj-footer">
+        <div class="stack-row">
+          <span class="stack-chip">LangChain</span>
+          <span class="stack-chip">RAG</span>
+          <span class="stack-chip">Vector Stores</span>
+          <span class="stack-chip">LLM Grounding</span>
+        </div>
+        <a class="proj-repo-link" href="https://github.com/ArtExists/PhilGTP" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          View Repo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 4: HGR_Temple_Run -->
+    <div class="proj-card" id="card-hgr">
+      <div class="proj-top">
+        <div class="proj-title-wrap">
+          <div class="proj-title">HGR_Temple_Run</div>
+          <span class="hanko-seal sm">掌</span>
+        </div>
+        <span class="conf">OPENCV + MEDIAPIPE</span>
+      </div>
+      <p class="proj-desc">A real-time Hand Gesture Recognition (HGR) system mapping dynamic finger coordinates and
+        joint vectors via MediaPipe and OpenCV directly into zero-latency game controller keypresses.</p>
+      <div class="proj-footer">
+        <div class="stack-row">
+          <span class="stack-chip">Gesture Recognition</span>
+          <span class="stack-chip">OpenCV</span>
+          <span class="stack-chip">MediaPipe</span>
+          <span class="stack-chip">Real-time IO</span>
+        </div>
+        <a class="proj-repo-link" href="https://github.com/ArtExists/HGR_Temple_Run" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          View Repo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 5: MNIST_Diffusion -->
+    <div class="proj-card" id="card-diffusion">
+      <div class="proj-top">
+        <div class="proj-title-wrap">
+          <div class="proj-title">MNIST_Diffusion</div>
+          <span class="hanko-seal sm">霧</span>
+        </div>
+        <span class="conf">DDPM + UNET + PYTORCH</span>
+      </div>
+      <p class="proj-desc">A generative Denoising Diffusion Probabilistic Model (DDPM) utilizing a custom UNet
+        architecture to iteratively denoise pure isotropic Gaussian noise into authentic handwritten digits.</p>
+      <div class="proj-footer">
+        <div class="stack-row">
+          <span class="stack-chip">Diffusion Models</span>
+          <span class="stack-chip">DDPM</span>
+          <span class="stack-chip">UNet</span>
+          <span class="stack-chip">PyTorch</span>
+        </div>
+        <a class="proj-repo-link" href="https://github.com/ArtExists/MNIST_Diffusion" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          View Repo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 6: Emotion_Det -->
+    <div class="proj-card" id="card-emotion">
+      <div class="proj-top">
+        <div class="proj-title-wrap">
+          <div class="proj-title">Emotion_Det</div>
+          <span class="hanko-seal sm">心</span>
+        </div>
+        <span class="conf">MULTIMODAL AI</span>
+      </div>
+      <p class="proj-desc">A unified multimodal perception system fusing micro-facial tracing, voice acoustic feature
+        vectors, and NLP sentiment representations for nuanced human emotional comprehension.</p>
+      <div class="proj-footer">
+        <div class="stack-row">
+          <span class="stack-chip">Multimodal Fusion</span>
+          <span class="stack-chip">Face Tracing</span>
+          <span class="stack-chip">Voice Analysis</span>
+          <span class="stack-chip">NLP</span>
+        </div>
+        <a class="proj-repo-link" href="https://github.com/ArtExists/Emotion_Det" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          View Repo ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE & EDUCATION SECTION -->
+  <section id="experience" class="reveal">
+    <div class="eyebrow">
+      <span class="eyebrow-kanji">経歴</span>
+      03 · Track Record &amp; Academics
+    </div>
+    <div class="section-head">
+      <h2>Experience &amp; Certifications <span class="hanko-seal sm">道</span></h2>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date">2025 · FORAGE</div>
+      <div class="exp-body">
+        <h4>Tata iQ — AI &amp; Data Analytics Program</h4>
+        <span class="role">Industry Simulation · Data Analytics &amp; Applied AI</span>
+        <p>Executed end-to-end data analytics and predictive modeling pipelines mirroring real enterprise AI strategy.
+        </p>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date">2024 – 2028</div>
+      <div class="exp-body">
+        <h4>IIIT Bhubaneswar — B.Tech, Computer Science &amp; Engineering</h4>
+        <span class="role">Expected Graduation: 2028 · CGPA Oriented</span>
+        <p>Comprehensive coursework in Data Structures &amp; Algorithms, Computer Architecture, Discrete Mathematics,
+          Linear Algebra, Probability, and independent deep learning research.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT SECTION -->
+  <section id="contact" class="reveal">
+    <div class="contact-box">
+      <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">
+        <span class="eyebrow-kanji">連絡</span>
+        04 · Get In Touch
+      </div>
+      <h2>Let's build intelligent systems together. <span class="hanko-seal sm">結</span></h2>
+      <p>Open for machine learning collaborations, research endeavors, computer vision projects, and engineering
+        internships.</p>
+      <div class="contact-links">
+        <a class="btn btn-solid" href="mailto:alokrtofc@gmail.com">
+          <span>Email Me</span> ✉️
+        </a>
+        <a class="btn" href="https://github.com/ArtExists" target="_blank" rel="noopener">
+          <span>GitHub</span> ↗
+        </a>
+        <a class="btn" href="https://linkedin.com/in/alok-ranjan-tripathy" target="_blank" rel="noopener">
+          <span>LinkedIn</span> ↗
+        </a>
+        <a class="btn btn-vermilion" href="ART_Resume-2.pdf" target="_blank" rel="noopener">
+          <span>View Resume (PDF)</span> 📄
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2026 Alok Ranjan Tripathy (ART) · Built with Old Japanese Aesthetics, Falling Sakura &amp; Roaming AI Companion
+    <span class="footer-kanji">桜花爛漫</span>
+  </footer>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- ROAMING SPIRIT BOT COMPANION (KITSUNE AI STICKER) -->
+  <!-- ---------------------------------------------------- -->
+  <div id="spirit-bot-container">
+    <div class="spirit-bot-wrap" id="spirit-bot" title="Kitsune AI Guide · Click me!">
+      <div class="spirit-aura"></div>
+      <div class="spirit-shadow"></div>
+      <div class="spirit-pointer-arrow" id="spirit-arrow"></div>
+
+      <div class="spirit-bot-inner">
+        <!-- Stylized Cyber-Origami Spirit Fox / Bot SVG -->
+        <svg class="spirit-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Torii Golden Crown Halo -->
+          <ellipse cx="50" cy="18" rx="22" ry="5" stroke="#ffd700" stroke-width="2.5" fill="none" opacity="0.85" />
+          <line x1="36" y1="18" x2="64" y2="18" stroke="#ffd700" stroke-width="2" />
+
+          <!-- Ears -->
+          <polygon points="26,42 16,14 42,32" fill="#0d111a" stroke="#e5c158" stroke-width="2.5" />
+          <polygon points="28,38 22,20 38,32" fill="#e05353" />
+
+          <polygon points="74,42 84,14 58,32" fill="#0d111a" stroke="#e5c158" stroke-width="2.5" />
+          <polygon points="72,38 78,20 62,32" fill="#e05353" />
+
+          <!-- Mask / Head Body -->
+          <path d="M50 24 C28 24 22 46 26 68 C30 84 50 94 50 94 C50 94 70 84 74 68 C78 46 72 24 50 24 Z" fill="#0d111a"
+            stroke="#e5c158" stroke-width="2.5" />
+
+          <!-- Forehead Japanese Inkan Marking -->
+          <path d="M50 32 L46 40 L50 44 L54 40 Z" fill="#e05353" />
+          <circle cx="50" cy="30" r="2" fill="#ffd700" />
+
+          <!-- Glowing Cyber Eyes (Expression Group) -->
+          <g class="bot-eyes" id="bot-eyes">
+            <!-- Normal Eyes -->
+            <ellipse class="eye-left" cx="38" cy="54" rx="4.5" ry="5.5" fill="#22d3ee" />
+            <circle class="eye-left-pupil" cx="39" cy="53" r="1.8" fill="#ffffff" />
+
+            <ellipse class="eye-right" cx="62" cy="54" rx="4.5" ry="5.5" fill="#22d3ee" />
+            <circle class="eye-right-pupil" cx="63" cy="53" r="1.8" fill="#ffffff" />
+          </g>
+
+          <!-- Whiskers / Facial Accents (Vermilion) -->
+          <path d="M22 62 Q 32 63 38 66" stroke="#e05353" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M22 70 Q 32 69 38 69" stroke="#e05353" stroke-width="1.8" stroke-linecap="round" />
+
+          <path d="M78 62 Q 68 63 62 66" stroke="#e05353" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M78 70 Q 68 69 62 69" stroke="#e05353" stroke-width="1.8" stroke-linecap="round" />
+
+          <!-- Cute Snout / Mouth -->
+          <polygon points="50,64 47,60 53,60" fill="#e5c158" />
+          <path d="M47 67 Q 50 71 53 67" stroke="#e5c158" stroke-width="1.5" fill="none" stroke-linecap="round" />
+        </svg>
+
+        <!-- Ofuda Talisman -->
+        <div class="spirit-talisman">護</div>
+      </div>
+
+      <!-- Dialogue Bubble -->
+      <div class="spirit-bubble" id="spirit-bubble">
+        <div class="bubble-header">
+          <span class="bot-name">🦊 Ask_ART Guide</span>
+          <button class="bubble-close" onclick="event.stopPropagation(); closeSpiritBubble()">✕</button>
+        </div>
+        <div class="bubble-text" id="bubble-text">
+          Konnichiwa! I am your portfolio spirit guide. Try talking to Ask_ART below!
+        </div>
+        <button class="bubble-cta" id="bubble-cta" onclick="event.stopPropagation(); executeBubbleAction()">
+          Try Ask_ART ⛩️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- FLOATING CHATBOT WIDGET -->
+  <!-- ---------------------------------------------------- -->
+  <button id="chat-toggle" onclick="toggleChat()" aria-label="Open Ask_ART chat">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+        stroke="#07090e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <div id="chat-panel">
+    <div class="chat-head">
+      <div class="chat-dot"></div>
+      <div class="chat-head-text">
+        <div class="name">
+          Ask_ART <span class="hanko-seal sm">智</span>
+        </div>
+        <div class="status">Pretrained Portfolio Companion · Online</div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="msg bot">
+        ようこそ (Welcome)! I'm <strong>Ask_ART</strong>, your intelligent guide to Alok's portfolio. Ask me about his
+        Computer Vision systems, SAM &amp; YOLO pipelines, NumPy models, or research!
+      </div>
+    </div>
+    <div class="chip-row" id="chip-row">
+      <button class="sugg-chip" onclick="sendSuggested('Tell me about TryThyEye sunglasses project!')">TryThyEye
+        🕶️</button>
+      <button class="sugg-chip" onclick="sendSuggested('How was NumPy ANN built from scratch?')">NumPy ANN 🧠</button>
+      <button class="sugg-chip" onclick="sendSuggested('What are your core AI & CV skills?')">Skills ⚔️</button>
+      <button class="sugg-chip" onclick="sendSuggested('Where are you studying?')">IIIT BBSR 🎓</button>
+    </div>
+    <div class="chat-input-row">
+      <input id="chat-input" type="text" placeholder="Ask about Alok's projects, CV, skills..."
+        onkeydown="if(event.key==='Enter')sendMessage()">
+      <button id="chat-send" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- JAVASCRIPT: AUDIO, SAKURA, SPIRIT BOT AI & CHATBOT -->
+  <!-- ---------------------------------------------------- -->
+  <script>
+    /* ====================================================
+       0. MOON FESTIVAL BACKGROUND AUDIO PLAYER CONTROLLER
+       (Default: PLAYING)
+       ==================================================== */
+    const bgAudio = document.getElementById('bg-audio');
+    const audioToggle = document.getElementById('audio-toggle');
+    const audioLabel = document.getElementById('audio-label');
+    let isAudioPlaying = true;
+
+    // Set soothing background volume & slowed tempo (e.g. 0.85 = 15% slower, dreamy vibe)
+    if (bgAudio) {
+      bgAudio.volume = 0.38;
+      bgAudio.playbackRate = 0.85; // <--- Adjust here: 0.85 = 15% slower, 0.75 = 25% slower
+      bgAudio.preservesPitch = false; // set to false for lo-fi slowed+pitch drop, or true to keep original pitch
+    }
+
+    function updateAudioUI(playing) {
+      isAudioPlaying = playing;
+      if (playing) {
+        audioToggle.classList.remove('muted');
+        audioLabel.textContent = 'OST: Playing';
+        audioToggle.title = 'Moon Festival 2025 (Brawl Stars OST) · Click to Turn Off';
+      } else {
+        audioToggle.classList.add('muted');
+        audioLabel.textContent = 'OST: Muted';
+        audioToggle.title = 'Moon Festival 2025 (Brawl Stars OST) · Click to Play';
+      }
+    }
+
+    function toggleAudio() {
+      if (!bgAudio) return;
+      if (bgAudio.paused) {
+        bgAudio.play().then(() => {
+          updateAudioUI(true);
+          localStorage.setItem('art_bg_audio_muted', 'false');
+        }).catch(err => {
+          console.log('Audio playback prevented:', err);
+        });
+      } else {
+        bgAudio.pause();
+        updateAudioUI(false);
+        localStorage.setItem('art_bg_audio_muted', 'true');
+      }
+    }
+
+    // Default playing: immediately attempt to play on load
+    function playAudioDefault() {
+      const userExplicitMuted = localStorage.getItem('art_bg_audio_muted') === 'true';
+      if (!userExplicitMuted && bgAudio) {
+        updateAudioUI(true);
+        const playPromise = bgAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            updateAudioUI(true);
+          }).catch(() => {
+            // Awaiting first touch / scroll / gesture to unblock browser policy
+            updateAudioUI(true);
+          });
+        }
+      } else if (userExplicitMuted) {
+        updateAudioUI(false);
+      }
+    }
+
+    // Auto-trigger on page load + 1 second failsafe timer
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        playAudioDefault();
+        setTimeout(playAudioDefault, 1000); // 1-second loading failsafe
+      });
+    } else {
+      playAudioDefault();
+      setTimeout(playAudioDefault, 1000); // 1-second loading failsafe
+    }
+
+    // Additional backup failsafe after 1000ms
+    setTimeout(() => {
+      const userExplicitMuted = localStorage.getItem('art_bg_audio_muted') === 'true';
+      if (!userExplicitMuted && bgAudio && bgAudio.paused) {
+        bgAudio.play().then(() => updateAudioUI(true)).catch(() => {});
+      }
+    }, 1000);
+
+    // Fallback: On very first touch, pointer down, click or keypress, start playing immediately
+    const startAudioOnFirstInteraction = () => {
+      const userExplicitMuted = localStorage.getItem('art_bg_audio_muted') === 'true';
+      if (!userExplicitMuted && bgAudio && bgAudio.paused) {
+        bgAudio.play().then(() => updateAudioUI(true)).catch(() => { });
+      }
+      ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(evt => {
+        window.removeEventListener(evt, startAudioOnFirstInteraction);
+      });
+    };
+    ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, startAudioOnFirstInteraction, { passive: true });
+    });
+
+    /* ====================================================
+       1. CUSTOM INTERACTIVE CURSOR
+       ==================================================== */
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+    let ringX = mouseX, ringY = mouseY;
+    let mouseVelocityX = 0, mouseVelocityY = 0, lastMouseX = mouseX, lastMouseY = mouseY;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.left = `${mouseX}px`;
+      dot.style.top = `${mouseY}px`;
+
+      mouseVelocityX = mouseX - lastMouseX;
+      mouseVelocityY = mouseY - lastMouseY;
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+    });
+
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      ring.style.left = `${ringX}px`;
+      ring.style.top = `${ringY}px`;
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // Hover effect for clickable elements
+    const hoverTargets = document.querySelectorAll('a, button, input, .proj-card, .sugg-chip, .det-tag, .pill, .spirit-bot-wrap, .hanko-seal, .audio-control-btn');
+    hoverTargets.forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+    });
+
+    /* ====================================================
+       2. SCROLL REVEAL OBSERVER
+       ==================================================== */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ====================================================
+       3. DYNAMIC FALLING CHERRY BLOSSOMS (SAKURA) ENGINE
+       (Very Slow & Translucent Soft Opacity)
+       ==================================================== */
+    const sakuraCanvas = document.getElementById('sakura-canvas');
+    const sCtx = sakuraCanvas.getContext('2d');
+    let sWidth = sakuraCanvas.width = window.innerWidth;
+    let sHeight = sakuraCanvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      sWidth = sakuraCanvas.width = window.innerWidth;
+      sHeight = sakuraCanvas.height = window.innerHeight;
+    });
+
+    class SakuraPetal {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(initial = false) {
+        this.x = Math.random() * sWidth;
+        this.y = initial ? Math.random() * sHeight : -25;
+        this.size = 8 + Math.random() * 9;
+
+        // Very slow, serene, meditative falling speed
+        this.speedY = 0.22 + Math.random() * 0.32;
+        this.speedX = (Math.random() - 0.45) * 0.22;
+
+        // Very slow, graceful 3D rotation & flip
+        this.angle = Math.random() * Math.PI * 2;
+        this.angularSpeed = (Math.random() - 0.5) * 0.008;
+        this.flip = Math.random() * Math.PI;
+        this.flipSpeed = 0.006 + Math.random() * 0.008;
+        this.sway = Math.random() * Math.PI * 2;
+        this.swaySpeed = 0.004 + Math.random() * 0.006;
+
+        // Decreased soft opacity around texts (ethereal & translucent)
+        this.opacity = 0.12 + Math.random() * 0.16;
+
+        // Sakura petal color palette: delicate whisper pink, soft blush
+        const petalHues = [
+          { r: 255, g: 183, b: 197 }, // Whisper Sakura
+          { r: 255, g: 205, b: 216 }, // Soft Pale Petal
+          { r: 248, g: 170, b: 190 }, // Delicate Rose
+          { r: 253, g: 232, b: 238 }, // White Sakura
+          { r: 235, g: 205, b: 120 }  // Soft Gold Flake
+        ];
+        this.color = petalHues[Math.floor(Math.random() * petalHues.length)];
+      }
+
+      update() {
+        this.sway += this.swaySpeed;
+        this.angle += this.angularSpeed;
+        this.flip += this.flipSpeed;
+
+        // Very gentle swaying breeze
+        const windX = Math.sin(this.sway) * 0.35 + 0.12;
+        this.x += this.speedX + windX;
+        this.y += this.speedY;
+
+        // Subtle soft reaction to mouse breeze
+        const dx = this.x - mouseX;
+        const dy = this.y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 90) {
+          const force = (90 - dist) / 90;
+          this.x += (dx / dist) * force * 1.5;
+          this.y += (dy / dist) * force * 1.2;
+        }
+
+        // Recycle petal when falling off screen
+        if (this.y > sHeight + 25 || this.x < -30 || this.x > sWidth + 30) {
+          this.reset(false);
+        }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.scale(Math.sin(this.flip), 1);
+
+        ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity})`;
+        ctx.beginPath();
+
+        // Organic curved sakura petal shape with top notch
+        const r = this.size;
+        ctx.moveTo(0, -r);
+        ctx.bezierCurveTo(-r * 0.8, -r * 0.7, -r * 0.9, r * 0.3, 0, r);
+        ctx.bezierCurveTo(r * 0.9, r * 0.3, r * 0.8, -r * 0.7, 0, -r);
+
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    const petals = Array.from({ length: 36 }, () => new SakuraPetal());
+
+    function renderSakura() {
+      sCtx.clearRect(0, 0, sWidth, sHeight);
+      petals.forEach(p => {
+        p.update();
+        p.draw(sCtx);
+      });
+      requestAnimationFrame(renderSakura);
+    }
+    renderSakura();
+
+    /* ====================================================
+       4. INTERACTIVE ROAMING SPIRIT BOT COMPANION CONTROLLER
+       (Gentler Speed + Multi-Second Lingering Pause)
+       ==================================================== */
+    const botContainer = document.getElementById('spirit-bot-container');
+    const botWrap = document.getElementById('spirit-bot');
+    const botEyes = document.getElementById('bot-eyes');
+    const spiritBubble = document.getElementById('spirit-bubble');
+    const bubbleText = document.getElementById('bubble-text');
+    const bubbleCta = document.getElementById('bubble-cta');
+    const spiritArrow = document.getElementById('spirit-arrow');
+
+    // Bot State Machine
+    let botX = window.innerWidth * 0.75;
+    let botY = window.innerHeight * 0.35;
+    let botVX = 0, botVY = 0;
+    let targetX = botX, targetY = botY;
+    let isFleeing = false;
+    let isLingering = false;
+    let lingerUntil = 0;
+    let currentBubbleAction = null;
+    let tourTimer = 0;
+    let nextTourInterval = 18000; // Guided tour every 18s
+
+    // Tour destinations & contextual dialogues
+    const tourStops = [
+      {
+        targetId: 'chat-toggle',
+        title: '⛩️ Ask_ART Chatbot',
+        text: 'Psst! Have questions about Alok\'s vision & RAG projects? Try chatting with Ask_ART!',
+        ctaText: 'Open Chatbot 💬',
+        action: () => toggleChat()
+      },
+      {
+        targetId: 'card-trythyeye',
+        title: '🕶️ TryThyEye System',
+        text: 'Look at this! A real-time virtual sunglasses segmenter powered by SAM & YOLO!',
+        ctaText: 'View TryThyEye ↗',
+        action: () => document.getElementById('card-trythyeye').scrollIntoView({ behavior: 'smooth' })
+      },
+      {
+        targetId: 'card-numpy',
+        title: '🧠 From-Scratch Neural Net',
+        text: 'Alok built an ANN entirely in pure NumPy — 85+% accuracy without any DL framework!',
+        ctaText: 'Inspect NumPy ANN ↗',
+        action: () => document.getElementById('card-numpy').scrollIntoView({ behavior: 'smooth' })
+      },
+      {
+        targetId: 'card-philgtp',
+        title: '📜 PhilGTP RAG Engine',
+        text: 'Grounds philosophical inquiries in canonical PDFs using LangChain and vector retrieval.',
+        ctaText: 'Explore PhilGTP ↗',
+        action: () => document.getElementById('card-philgtp').scrollIntoView({ behavior: 'smooth' })
+      },
+      {
+        targetId: 'contact',
+        title: '✉️ Connect with Alok',
+        text: 'Need an AI engineer or CV specialist? Send Alok a message or connect on LinkedIn!',
+        ctaText: 'Send Email ✉️',
+        action: () => window.location.href = 'mailto:alokrtofc@gmail.com'
+      }
+    ];
+    let tourIndex = 0;
+
+    // Pick a new wander target and schedule lingering once reached
+    function pickRandomTarget() {
+      if (isFleeing) return;
+      const margin = 90;
+      targetX = margin + Math.random() * (window.innerWidth - margin * 2 - 80);
+      targetY = margin + Math.random() * (window.innerHeight - margin * 2 - 80);
+      isLingering = false;
+    }
+    pickRandomTarget();
+
+    // Bot Expression Switcher
+    function setBotExpression(state) {
+      if (state === 'startled') {
+        botEyes.innerHTML = `
+          <ellipse cx="36" cy="54" rx="6.5" ry="6.5" fill="#ffd700" stroke="#e05353" stroke-width="1.5" />
+          <circle cx="36" cy="54" r="2.5" fill="#07090e" />
+          <ellipse cx="64" cy="54" rx="6.5" ry="6.5" fill="#ffd700" stroke="#e05353" stroke-width="1.5" />
+          <circle cx="64" cy="54" r="2.5" fill="#07090e" />
+        `;
+        botWrap.classList.add('startled');
+      } else if (state === 'happy') {
+        botEyes.innerHTML = `
+          <path d="M32 56 Q 38 48 44 56" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M56 56 Q 62 48 68 56" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round" />
+        `;
+        botWrap.classList.remove('startled');
+      } else {
+        // Normal peaceful state
+        botEyes.innerHTML = `
+          <ellipse class="eye-left" cx="38" cy="54" rx="4.5" ry="5.5" fill="#22d3ee" />
+          <circle class="eye-left-pupil" cx="39" cy="53" r="1.8" fill="#ffffff" />
+          <ellipse class="eye-right" cx="62" cy="54" rx="4.5" ry="5.5" fill="#22d3ee" />
+          <circle class="eye-right-pupil" cx="63" cy="53" r="1.8" fill="#ffffff" />
+        `;
+        botWrap.classList.remove('startled');
+      }
+    }
+
+    // Show Guided Tour Prompt (and linger at the spot for 6-8 seconds!)
+    function triggerComponentTour() {
+      if (isFleeing) return;
+      const stop = tourStops[tourIndex % tourStops.length];
+      tourIndex++;
+
+      const el = document.getElementById(stop.targetId);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        let destX = rect.left + rect.width / 2 - 37;
+        let destY = rect.top - 90;
+
+        destX = Math.max(50, Math.min(window.innerWidth - 120, destX));
+        destY = Math.max(60, Math.min(window.innerHeight - 150, destY));
+
+        targetX = destX;
+        targetY = destY;
+        isLingering = false;
+
+        // Once it arrives, open speech bubble and linger for 7 seconds
+        setTimeout(() => {
+          bubbleText.textContent = stop.text;
+          bubbleCta.textContent = stop.ctaText;
+          currentBubbleAction = stop.action;
+          spiritBubble.classList.add('active');
+          spiritArrow.classList.add('active');
+          setBotExpression('happy');
+
+          // Linger peacefully at this tour stop for 6.5 seconds
+          isLingering = true;
+          lingerUntil = Date.now() + 6500;
+
+          setTimeout(() => {
+            closeSpiritBubble();
+          }, 6500);
+        }, 1800);
+      }
+    }
+
+    function closeSpiritBubble() {
+      spiritBubble.classList.remove('active');
+      spiritArrow.classList.remove('active');
+      setBotExpression('normal');
+    }
+
+    function executeBubbleAction() {
+      if (typeof currentBubbleAction === 'function') {
+        currentBubbleAction();
+      }
+      closeSpiritBubble();
+    }
+
+    // Interactive Click on Companion
+    botWrap.addEventListener('click', (e) => {
+      e.stopPropagation();
+      botWrap.classList.add('spin-celebrate');
+      setBotExpression('happy');
+
+      // Soft burst of micro sakura petals
+      for (let i = 0; i < 6; i++) {
+        const p = new SakuraPetal();
+        p.x = botX + 37;
+        p.y = botY + 37;
+        p.speedX = (Math.random() - 0.5) * 3;
+        p.speedY = (Math.random() - 0.5) * 3;
+        petals.push(p);
+      }
+
+      const randomQuotes = [
+        "ようこそ! I am your AI spirit familiar 🦊✨",
+        "Exploring Alok's vision models? Ask me anything!",
+        "TryThyEye sunglasses segmenter is super cool! 🕶️",
+        "Click the golden chat button anytime to chat! ⛩️"
+      ];
+      bubbleText.textContent = randomQuotes[Math.floor(Math.random() * randomQuotes.length)];
+      bubbleCta.textContent = 'Talk to Ask_ART 💬';
+      currentBubbleAction = () => toggleChat();
+      spiritBubble.classList.add('active');
+
+      // Stay lingering for 5 seconds after click
+      isLingering = true;
+      lingerUntil = Date.now() + 5000;
+
+      setTimeout(() => {
+        botWrap.classList.remove('spin-celebrate');
+      }, 700);
+    });
+
+    // Main Physics & Wandering Loop with Smooth Lingering
+    let lingerHoverPhase = 0;
+
+    function updateSpiritBot() {
+      const now = Date.now();
+      const botCenterX = botX + 37;
+      const botCenterY = botY + 37;
+      const distToMouse = Math.hypot(mouseX - botCenterX, mouseY - botCenterY);
+
+      // 1. Cursor Evasion (proximity threshold set to 15)
+      if (distToMouse < 15) {
+        isFleeing = true;
+        isLingering = false;
+        setBotExpression('startled');
+        closeSpiritBubble();
+
+        const angleFromMouse = Math.atan2(botCenterY - mouseY, botCenterX - mouseX);
+        const fleeSpeed = Math.min(5.2, (15 - distToMouse) * 0.06 + 2.2);
+
+        botVX += Math.cos(angleFromMouse) * fleeSpeed * 0.32;
+        botVY += Math.sin(angleFromMouse) * fleeSpeed * 0.32;
+      } else {
+        if (isFleeing) {
+          isFleeing = false;
+          setBotExpression('normal');
+          // Once away from cursor, rest peacefully at the new location for 4 seconds!
+          isLingering = true;
+          lingerUntil = now + 4000;
+        }
+
+        const dx = targetX - botX;
+        const dy = targetY - botY;
+        const distToTarget = Math.hypot(dx, dy);
+
+        // Check if arrived near destination -> Enter Lingering Pause State for 4.5 to 7.5 seconds
+        if (!isLingering && distToTarget < 38) {
+          isLingering = true;
+          lingerUntil = now + (4500 + Math.random() * 3000); // 4.5s to 7.5s pause
+        }
+
+        if (isLingering) {
+          // While lingering: Stay right here and gently hover with soft harmonic wave
+          lingerHoverPhase += 0.035;
+          botVX *= 0.85;
+          botVY *= 0.85;
+          botVY += Math.sin(lingerHoverPhase) * 0.08;
+
+          // When lingering timer expires, pick a new destination and start leisurely glide!
+          if (now > lingerUntil) {
+            isLingering = false;
+            pickRandomTarget();
+          }
+        } else {
+          // Smooth, slower, relaxed glide towards destination
+          botVX += dx * 0.0009;
+          botVY += dy * 0.0009;
+        }
+      }
+
+      // Physics damping & speed capping (gentle, relaxed movement)
+      botVX *= 0.93;
+      botVY *= 0.93;
+
+      const currentSpeed = Math.hypot(botVX, botVY);
+      const maxSpeed = isFleeing ? 5.5 : 2.0; // relaxed max speed
+      if (currentSpeed > maxSpeed) {
+        botVX = (botVX / currentSpeed) * maxSpeed;
+        botVY = (botVY / currentSpeed) * maxSpeed;
+      }
+
+      botX += botVX;
+      botY += botVY;
+
+      // Screen boundary collision and soft deflection
+      const margin = 20;
+      if (botX < margin) { botX = margin; botVX *= -0.8; }
+      if (botX > window.innerWidth - 94) { botX = window.innerWidth - 94; botVX *= -0.8; }
+      if (botY < margin) { botY = margin; botVY *= -0.8; }
+      if (botY > window.innerHeight - 94) { botY = window.innerHeight - 94; botVY *= -0.8; }
+
+      // Apply transform smoothly
+      botContainer.style.transform = `translate3d(${botX}px, ${botY}px, 0)`;
+
+      // Subtle tilt in direction of motion
+      const tilt = Math.max(-10, Math.min(10, botVX * 2.2));
+      botWrap.style.transform = `rotate(${tilt}deg)`;
+
+      // Tour timer update
+      tourTimer += 16;
+      if (tourTimer > nextTourInterval) {
+        tourTimer = 0;
+        nextTourInterval = 18000 + Math.random() * 6000;
+        triggerComponentTour();
+      }
+
+      requestAnimationFrame(updateSpiritBot);
+    }
+    requestAnimationFrame(updateSpiritBot);
+
+    // Initial greeting after 4 seconds
+    setTimeout(() => {
+      triggerComponentTour();
+    }, 4000);
+
+    /* ====================================================
+       5. ASK_ART CHAT WIDGET CALLING BACKEND API
+       ==================================================== */
+    function toggleChat() {
+      const panel = document.getElementById('chat-panel');
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) {
+        document.getElementById('chat-input').focus();
+        closeSpiritBubble();
+      }
+    }
+
+    function openChat() {
+      document.getElementById('chat-panel').classList.add('open');
+      document.getElementById('chat-input').focus();
+      closeSpiritBubble();
+    }
+
+    let chatHistory = [];
+
+    async function callAI(userText) {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userText, history: chatHistory })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.reply) {
+            return data.reply;
+          }
+        }
+      } catch (e) {
+        console.error("Backend request failed:", e);
+      }
+      return "ようこそ! Ask_ART pretrained engine is online. Alok specializes in Computer Vision (SAM, YOLO, MediaPipe) and Generative AI at IIIT Bhubaneswar!";
+    }
+
+    function appendMsg(text, cls) {
+      const body = document.getElementById('chat-body');
+      const div = document.createElement('div');
+      div.className = 'msg ' + cls;
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+      return div;
+    }
+
+    async function handleSend(text) {
+      if (!text.trim()) return;
+      document.getElementById('chip-row').style.display = 'none';
+      appendMsg(text, 'user');
+      chatHistory.push({ role: "user", content: text });
+      document.getElementById('chat-input').value = '';
+      document.getElementById('chat-send').disabled = true;
+
+      const typingEl = appendMsg('Ask_ART is contemplating… ⛩️', 'typing');
+
+      try {
+        const reply = await callAI(text);
+        typingEl.remove();
+        appendMsg(reply, 'bot');
+        chatHistory.push({ role: "assistant", content: reply });
+      } catch (e) {
+        typingEl.remove();
+        appendMsg("Ask_ART model online — ask about TryThyEye, NumPy ANN, PhilGTP or IIIT BBSR!", 'bot');
+      }
+      document.getElementById('chat-send').disabled = false;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      handleSend(input.value);
+    }
+
+    function sendSuggested(text) {
+      handleSend(text);
+    }
+  </script>
+</body>
+
+</html>
