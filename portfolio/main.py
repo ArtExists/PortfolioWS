@@ -182,8 +182,10 @@ class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
+# Vercel Serverless Function Entrypoint Exports
+handler = PortfolioRequestHandler
+app = PortfolioRequestHandler
+application = PortfolioRequestHandler
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
