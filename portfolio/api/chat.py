@@ -1,41 +1,42 @@
-import http.server
-import socketserver
+from http.server import BaseHTTPRequestHandler
 import json
 import os
-import dotenv
 import pypdf
 
-# Load API keys from local .env
-ENV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-dotenv.load_dotenv(ENV_PATH)
-
-PORT = 8000
-RESUME_PDF_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ART_Resume-2.pdf")
-
-# ----------------------------------------------------
-# 1. EXTRACT TEXT FROM RESUME PDF (ART_Resume-2.pdf)
-# ----------------------------------------------------
-RESUME_TEXT = ""
+# Load dotenv if running locally
 try:
-    if os.path.exists(RESUME_PDF_PATH):
-        reader = pypdf.PdfReader(RESUME_PDF_PATH)
-        extracted_pages = []
-        for i, page in enumerate(reader.pages):
-            page_text = page.extract_text()
-            if page_text:
-                extracted_pages.append(f"--- PAGE {i+1} ---\n{page_text.strip()}")
-        RESUME_TEXT = "\n\n".join(extracted_pages)
-        print(f"[Resume Loader] Successfully extracted {len(RESUME_TEXT)} characters from ART_Resume-2.pdf")
-    else:
-        print(f"[Resume Loader Warning] PDF not found at {RESUME_PDF_PATH}")
-except Exception as e:
-    print(f"[Resume Loader Error] Could not read PDF: {e}")
+    import dotenv
+    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+except Exception:
+    pass
 
-# ----------------------------------------------------
-# 2. INITIALIZE LANGCHAIN WITH FREE MISTRAL AI MODEL
-# ----------------------------------------------------
+# Try finding the resume PDF
+RESUME_TEXT = ""
+possible_paths = [
+    os.path.join(os.path.dirname(__file__), "..", "ART_Resume-2.pdf"),
+    os.path.join(os.path.dirname(__file__), "ART_Resume-2.pdf"),
+    os.path.join(os.getcwd(), "ART_Resume-2.pdf"),
+    "ART_Resume-2.pdf"
+]
+
+for p in possible_paths:
+    if os.path.exists(p):
+        try:
+            reader = pypdf.PdfReader(p)
+            extracted_pages = []
+            for i, page in enumerate(reader.pages):
+                txt = page.extract_text()
+                if txt:
+                    extracted_pages.append(f"--- PAGE {i+1} ---\n{txt.strip()}")
+            RESUME_TEXT = "\n\n".join(extracted_pages)
+            break
+        except Exception:
+            pass
+
+# Initialize Mistral AI via LangChain
 mistral_chain = None
-raw_key = os.getenv("MISTRAL_API_KEY", "")
+raw_key = os.environ.get("MISTRAL_API_KEY", "")
 api_key = raw_key.strip().strip('"').strip("'") if raw_key else ""
 
 if api_key:
@@ -44,7 +45,6 @@ if api_key:
         from langchain_core.prompts import ChatPromptTemplate
         from langchain_core.output_parsers import StrOutputParser
 
-        # Use free Mistral model: open-mistral-7b (Mistral 7B)
         llm = ChatMistralAI(
             model="open-mistral-7b",
             mistral_api_key=api_key,
@@ -83,15 +83,10 @@ if api_key:
         ])
 
         mistral_chain = prompt | llm | StrOutputParser()
-        print(f"[LangChain] Initialized Mistral AI with model 'open-mistral-7b' (Key: {api_key[:6]}...{api_key[-4:]})")
-    except Exception as e:
-        print(f"[LangChain Error] Could not initialize ChatMistralAI: {e}")
-else:
-    print("[LangChain Warning] No MISTRAL_API_KEY found in .env; will use built-in knowledge base.")
+    except Exception:
+        mistral_chain = None
 
-# ----------------------------------------------------
-# 3. RULE-BASED FALLBACK KNOWLEDGE BASE (ZERO DOWNTIME)
-# ----------------------------------------------------
+
 def get_fallback_answer(user_message: str) -> str:
     msg = (user_message or "").lower().strip()
     if not msg:
@@ -129,9 +124,7 @@ def get_fallback_answer(user_message: str) -> str:
 
     return f"✨ Ask_ART received: '{user_message}'. Alok specializes in Computer Vision (SAM, YOLO), Generative AI (Diffusion, RAG), and Deep Learning at IIIT Bhubaneswar. Feel free to ask about his projects, skills, or contact info!"
 
-# ----------------------------------------------------
-# 4. CHAT QUERY DISPATCHER (LANGCHAIN MISTRAL + FALLBACK)
-# ----------------------------------------------------
+
 def generate_chat_response(user_message: str) -> str:
     user_msg = (user_message or "").strip()
     if not user_msg:
@@ -139,45 +132,37 @@ def generate_chat_response(user_message: str) -> str:
 
     if mistral_chain is not None:
         try:
-            print(f"[Mistral Query] Prompting LangChain Mistral for: '{user_msg}'")
             response = mistral_chain.invoke({"question": user_msg})
             if response and response.strip():
                 return response.strip()
-        except Exception as e:
-            print(f"[Mistral API Error] Falling back to knowledge base: {e}")
+        except Exception:
+            pass
 
-    # Fallback to smart knowledge base if offline or API error
     return get_fallback_answer(user_msg)
 
-# ----------------------------------------------------
-# 5. HTTP SERVER & REST API HANDLER
-# ----------------------------------------------------
-class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
+
+class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path == "/api/chat":
+        try:
             content_length = int(self.headers.get("Content-Length", 0))
             post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode("utf-8")) if post_data else {}
+            user_msg = data.get("message", "")
             
-            try:
-                data = json.loads(post_data.decode("utf-8")) if post_data else {}
-                user_msg = data.get("message", "")
-                
-                # Fetch answer via LangChain Mistral AI + Resume Context
-                bot_reply = generate_chat_response(user_msg)
-                response_data = {"reply": bot_reply}
-                
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json; charset=utf-8")
-                self.send_header("Access-Control-Allow-Origin", "*")
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode("utf-8"))
-            except Exception as e:
-                self.send_response(500)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
-        else:
-            self.send_error(404, "Endpoint Not Found")
+            bot_reply = generate_chat_response(user_msg)
+            response_data = {"reply": bot_reply}
+            
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode("utf-8"))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
 
     def do_OPTIONS(self):
         self.send_response(200)
@@ -185,14 +170,3 @@ class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
-
-if __name__ == "__main__":
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), PortfolioRequestHandler) as httpd:
-        print(f"Portfolio Server running at http://localhost:{PORT}")
-        print(f"Chat API Endpoint: http://localhost:{PORT}/api/chat (LangChain Mistral Powered)")
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\nShutting down server.")
