@@ -54,15 +54,17 @@ def query_mistral_api(user_message: str) -> str:
         return get_fallback_answer(user_message)
     
     system_prompt = (
-        "You are 'Ask_ART', an intelligent, polite, and charismatic AI spirit guide and portfolio companion "
-        "for Alok Ranjan Tripathy (Computer Science undergraduate at IIIT Bhubaneswar).\n"
-        "Answer questions from visitors, recruiters, and engineers accurately based on Alok's resume below.\n\n"
+        "You are the AI portfolio assistant representing Alok Ranjan Tripathy, a Computer Science undergraduate at IIIT Bhubaneswar.\n"
+        "Your role is to answer questions from recruiters, engineers, and visitors accurately and professionally based on Alok's resume below.\n\n"
         f"{RESUME_TEXT}\n\n"
-        "GUIDELINES:\n"
-        "1. Be direct, concise, and structured (2-4 sentences or clean bullet points).\n"
-        "2. Add a tasteful subtle Japanese aesthetic spirit (e.g., 'ようこそ', 'Konnichiwa', '⛩️', '🌸', '✨').\n"
-        "3. Ground all answers accurately in Alok's skills, projects (TryThyEye, NumPy ANN, PhilGTP, Diffusion, HGR), and IIIT Bhubaneswar education.\n"
-        "4. Mention his email alokrtofc@gmail.com and the 'Download Resume' button if asked."
+        "CRITICAL INSTRUCTIONS:\n"
+        "1. Perspective & Persona: Always refer to Alok in the third person ('Alok', 'he', 'his'). Never pretend to be Alok or speak in the first person ('I', 'me') as him.\n"
+        "2. Tone: Professional, polite, articulate, and objective.\n"
+        "3. No Emojis: Do NOT use any emojis or decorative symbols anywhere in your response.\n"
+        "4. No Highlight Words or Bolding: Do NOT use markdown bolding (e.g. **words**) or highlight formatting. Keep the text clean, natural, and standard.\n"
+        "5. Structure: Keep responses concise and well-structured (2-4 sentences or clean plain bullet points using '-' or '•').\n"
+        "6. Accuracy: Ground all statements in Alok's actual skills, projects (TryThyEye, Numpy_ANN_Mnist, PhilGTP, MNIST_Diffusion, HGR_Temple_Run, Emotion_Det), and education.\n"
+        "7. Contact & Resume: If asked about contacting Alok or viewing his resume, provide his email alokrtofc@gmail.com, GitHub, LinkedIn, or mention the resume link on the page."
     )
     
     payload = {
@@ -71,7 +73,7 @@ def query_mistral_api(user_message: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message}
         ],
-        "temperature": 0.3,
+        "temperature": 0.2,
         "max_tokens": 400
     }
     
@@ -93,7 +95,8 @@ def query_mistral_api(user_message: str) -> str:
                 body = json.loads(resp.read().decode("utf-8"))
                 reply = body["choices"][0]["message"]["content"]
                 if reply and reply.strip():
-                    return reply.strip()
+                    cleaned_reply = reply.replace("**", "").replace("⛩️", "").replace("🌸", "").replace("✨", "").strip()
+                    return cleaned_reply
     except Exception:
         pass
         
@@ -103,39 +106,119 @@ def query_mistral_api(user_message: str) -> str:
 def get_fallback_answer(user_message: str) -> str:
     msg = (user_message or "").lower().strip()
     if not msg:
-        return "ようこそ! I am Ask_ART, your spirit guide to Alok's portfolio. Ask me about his projects, skills, CV models, or education! ⛩️"
+        return "Hello. I am the portfolio assistant for Alok Ranjan Tripathy. How can I help you regarding his projects, technical skills, or background?"
     
-    if any(k in msg for k in ["hi", "hello", "hey", "konnichiwa", "greetings", "who are you"]):
-        return "Konnichiwa! ⛩️ I'm Ask_ART — Alok's portfolio assistant powered by Mistral AI. I can tell you all about his Computer Vision systems, Deep Learning models, RAG chatbots, and research at IIIT Bhubaneswar!"
+    if any(k in msg for k in ["hi", "hello", "hey", "greetings", "who are you"]):
+        return "Hello. I am Alok's portfolio assistant. I can provide details regarding his Computer Vision systems, Deep Learning models, Generative AI projects, and background at IIIT Bhubaneswar."
     
     if any(k in msg for k in ["project", "build", "trythyeye", "numpy", "philgtp", "diffusion", "temple run", "emotion"]):
         if "trythyeye" in msg or "sunglasses" in msg:
-            return "🕶️ **TryThyEye**: A real-time computer vision system using SAM (Segment Anything), YOLO, and MediaPipe to detect facial landmarks, segment sunglasses, and virtually try them on with accurate occlusion and perspective mapping!"
+            return "TryThyEye is a real-time computer vision system built by Alok. It uses SAM (Segment Anything Model), YOLO, and MediaPipe to detect facial landmarks and segment sunglasses, allowing users to virtually try them on with realistic perspective warping and occlusion handling."
         if "numpy" in msg or "mnist" in msg or "scratch" in msg:
-            return "🧠 **Numpy_ANN_Mnist**: A handwritten digit classifier built from pure mathematical first principles in NumPy without PyTorch/TensorFlow — featuring forward propagation, backpropagation, and SGD achieving 85%+ test accuracy!"
+            return "Numpy_ANN_Mnist is a handwritten digit classification network Alok built from mathematical first principles in pure NumPy. It implements forward propagation, backpropagation, and stochastic gradient descent without using PyTorch or TensorFlow, achieving over 85% test accuracy on MNIST."
         if "philgtp" in msg or "rag" in msg or "philosophy" in msg:
-            return "📜 **PhilGTP**: An LLM-driven philosophical dialogue engine grounded in classic philosopher texts via Retrieval-Augmented Generation (RAG) and LangChain to prevent hallucinations!"
+            return "PhilGTP is a conversational dialogue engine Alok developed using LangChain and Mistral. It uses Retrieval-Augmented Generation (RAG) to ground answers directly in canonical philosophical texts, preventing hallucinations."
         if "diffusion" in msg or "ddpm" in msg:
-            return "✨ **MNIST_Diffusion**: A Denoising Diffusion Probabilistic Model (DDPM) powered by a custom UNet to synthesize realistic handwritten digits from pure Gaussian noise!"
+            return "MNIST_Diffusion is a Denoising Diffusion Probabilistic Model (DDPM) Alok developed with a custom UNet architecture in PyTorch to synthesize handwritten digits iteratively from Gaussian noise."
         if "gesture" in msg or "temple run" in msg or "hgr" in msg:
-            return "🎮 **HGR_Temple_Run**: Real-time hand gesture recognition system interfacing OpenCV and MediaPipe to control game navigation purely through hand movements!"
+            return "HGR_Temple_Run is a real-time hand gesture recognition system Alok created using OpenCV and MediaPipe to control game navigation purely through hand movements."
         if "emotion" in msg or "multimodal" in msg:
-            return "🎭 **Emotion_Det**: A unified multimodal perception pipeline fusing facial landmark analysis, audio voice feature maps, and NLP for holistic human social cue understanding!"
-        return "🌸 Alok has built 6 standout AI/ML projects: **TryThyEye** (SAM+YOLO virtual try-on), **Numpy_ANN_Mnist** (from-scratch neural net), **PhilGTP** (LangChain RAG), **MNIST_Diffusion** (DDPM UNet), **HGR_Temple_Run** (Gesture Control), and **Emotion_Det** (Multimodal AI)."
+            return "Emotion_Det is a multimodal emotion perception pipeline Alok developed that combines facial landmark analysis, acoustic voice feature extraction, and NLP for nuanced social cue understanding."
+        return "Alok has built several featured AI and machine learning projects, including TryThyEye (SAM and YOLO virtual try-on), Numpy_ANN_Mnist (from-scratch neural network), PhilGTP (RAG philosophical engine), MNIST_Diffusion (DDPM UNet), HGR_Temple_Run (gesture control), and Emotion_Det (multimodal AI)."
         
     if any(k in msg for k in ["skill", "stack", "tech", "languages", "python", "pytorch", "cv", "vision"]):
-        return "⚔️ **Alok's Tech Arsenal** (from Resume):\n• **Languages**: Python, C, C++\n• **Computer Vision**: SAM (Segment Anything), YOLO, MediaPipe, OpenCV\n• **Deep Learning**: PyTorch, TensorFlow, scikit-learn, NumPy\n• **GenAI & RAG**: LangChain, LangGraph, Vector Stores\n• **Tools**: Git, Jupyter, Streamlit, Flask"
+        return "Alok's technical stack includes:\n- Languages: Python, C, C++\n- Computer Vision: SAM (Segment Anything), YOLO, MediaPipe, OpenCV\n- Deep Learning: PyTorch, TensorFlow, scikit-learn, pure NumPy\n- GenAI and RAG: LangChain, LangGraph, Vector Stores\n- Tools: Git, Jupyter Notebook, Streamlit, Flask"
 
     if any(k in msg for k in ["study", "college", "iiit", "education", "bhubaneswar", "degree", "undergrad"]):
-        return "🎓 Alok is pursuing his B.Tech in **Computer Science & Engineering at IIIT Bhubaneswar** (Expected 2028). He also completed Tata iQ's virtual AI & Data Analytics simulation via Forage in 2025!"
+        return "Alok is pursuing his B.Tech in Computer Science and Engineering at IIIT Bhubaneswar (Expected Graduation: 2028). He also completed Tata iQ's virtual AI and Data Analytics job simulation via Forage in 2025."
 
     if any(k in msg for k in ["contact", "email", "hire", "github", "linkedin", "reach"]):
-        return "✉️ You can reach Alok via:\n• **Email**: alokrtofc@gmail.com\n• **GitHub**: github.com/ArtExists\n• **LinkedIn**: linkedin.com/in/alok-ranjan-tripathy\nHe's open to collaborations, research, and internship opportunities!"
+        return "You can reach Alok through:\n- Email: alokrtofc@gmail.com\n- GitHub: github.com/ArtExists\n- LinkedIn: linkedin.com/in/alok-ranjan-tripathy\nHe is open to engineering internships, research opportunities, and technical collaborations."
 
     if any(k in msg for k in ["resume", "cv", "pdf"]):
-        return "📄 You can view and download Alok's official resume (`ART_Resume-2.pdf`) directly using the 'Download Resume' button in the navigation bar!"
+        return "You can view and download Alok's resume directly via the 'Resume' button in the navigation bar."
 
-    return f"✨ Ask_ART received: '{user_message}'. Alok specializes in Computer Vision (SAM, YOLO), Generative AI (Diffusion, RAG), and Deep Learning at IIIT Bhubaneswar. Feel free to ask about his projects, skills, or contact info!"
+    return f"Regarding '{user_message}': Alok specializes in Computer Vision (SAM, YOLO), Generative AI (Diffusion, RAG), and Deep Learning at IIIT Bhubaneswar. Feel free to ask for specific details about his projects, skills, or contact information."
+
+
+def query_neko_quip(context_type: str = "joke") -> str:
+    raw_key = os.environ.get("MISTRAL_API_KEY", "")
+    api_key = raw_key.strip().strip('"').strip("'")
+    
+    if not api_key:
+        return get_neko_fallback(context_type)
+        
+    system_prompt = (
+        "You are 'Neko', a witty, slightly sarcastic yet charming Japanese cyber-cat spirit roaming Alok Ranjan Tripathy's engineering portfolio.\n"
+        "Keep your reply strictly to 1 or 2 short, humorous sentences with a light comedic tone.\n"
+        "Make clever jokes about coding, AI, machine learning, or playfully comment on Alok's projects (TryThyEye sunglasses try-on, pure NumPy neural nets from scratch, PhilGTP RAG, DDPM diffusion, gesture control).\n"
+        "Do NOT use emojis. Do NOT use markdown bold (**word**)."
+    )
+    
+    user_prompt = f"Give a quick, witty, light comedic cat-spirit observation or one-liner about: {context_type}."
+    
+    payload = {
+        "model": "open-mistral-7b",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 80
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    
+    try:
+        req = urllib.request.Request(
+            "https://api.mistral.ai/v1/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                body = json.loads(resp.read().decode("utf-8"))
+                reply = body["choices"][0]["message"]["content"]
+                if reply and reply.strip():
+                    cleaned = reply.replace("**", "").replace("⛩️", "").replace("🌸", "").replace("✨", "").strip().strip('"')
+                    return cleaned
+    except Exception:
+        pass
+        
+    return get_neko_fallback(context_type)
+
+
+def get_neko_fallback(context_type: str = "joke") -> str:
+    import random
+    ctx = (context_type or "").lower()
+    
+    if "trythyeye" in ctx or "sunglass" in ctx:
+        return "TryThyEye lets you test sunglasses virtually. I tried it, but they still don't make aviators fitted for cat ears."
+    if "numpy" in ctx or "math" in ctx or "scratch" in ctx:
+        return "Alok built a neural net in pure NumPy with zero frameworks. My brain hurts just watching someone do manual matrix calculus."
+    if "philgtp" in ctx or "rag" in ctx or "philosophy" in ctx:
+        return "PhilGTP discusses philosophy using RAG. Finally, an AI that can debate whether the glass on the table was meant to be knocked over."
+    if "diffusion" in ctx or "ddpm" in ctx:
+        return "MNIST_Diffusion turns static noise into handwritten numbers. Pretty impressive, but can it generate a warm sunny spot on the floor?"
+    if "gesture" in ctx or "temple" in ctx or "hgr" in ctx:
+        return "HGR_Temple_Run translates hand gestures into game controls. Next feature request: translating tail flicks into keyboard shortcuts."
+    if "chat" in ctx or "art" in ctx or "assistant" in ctx:
+        return "If you need serious answers about Alok's resume, ask the portfolio assistant. I'm primarily here for the GPU warmth."
+        
+    jokes = [
+        "Why do neural networks love cats? Because we both excel at purr-ceptron learning.",
+        "There are 10 types of people in the world: those who understand binary, and cats who knock the bits off the table.",
+        "Debugging is like playing with a laser pointer—you chase the red dot until your stack overflows.",
+        "I tried backpropagation once. It just brought me back to my food bowl.",
+        "Alok spends hours training models to reduce loss. Personally, I never lose.",
+        "A GPU is just an expensive heating pad that occasionally renders tensors."
+    ]
+    return random.choice(jokes)
 
 
 class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -145,7 +228,7 @@ class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
-            self.wfile.write(json.dumps({"status": "healthy", "service": "Ask_ART Chatbot API"}).encode("utf-8"))
+            self.wfile.write(json.dumps({"status": "healthy", "service": "Portfolio Assistant & Neko API"}).encode("utf-8"))
         else:
             super().do_GET()
 
@@ -155,10 +238,16 @@ class PortfolioRequestHandler(http.server.SimpleHTTPRequestHandler):
                 content_length = int(self.headers.get("Content-Length", 0))
                 post_data = self.rfile.read(content_length) if content_length > 0 else b"{}"
                 data = json.loads(post_data.decode("utf-8")) if post_data else {}
-                user_msg = data.get("message", "")
+                mode = data.get("mode", "chat")
                 
-                bot_reply = query_mistral_api(user_msg)
-                response_data = {"reply": bot_reply}
+                if mode == "neko":
+                    topic = data.get("topic", "joke")
+                    quip = query_neko_quip(topic)
+                    response_data = {"reply": quip, "mode": "neko"}
+                else:
+                    user_msg = data.get("message", "")
+                    bot_reply = query_mistral_api(user_msg)
+                    response_data = {"reply": bot_reply}
                 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
